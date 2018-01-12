@@ -3,6 +3,7 @@
 	<name>2018-PowerUp</name>
 	<comment></comment>
 	<projects>
+		<project>Utilities</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>
