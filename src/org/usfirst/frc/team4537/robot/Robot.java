@@ -12,8 +12,10 @@ import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.command.Scheduler;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import org.usfirst.frc.team4537.robot.commands.ExampleCommand;
-import org.usfirst.frc.team4537.robot.subsystems.ExampleSubsystem;
+import org.usfirst.frc.team4537.robot.commands.*;
+import org.usfirst.frc.team4537.robot.subsystems.*;
+
+import com.ctre.phoenix.motorcontrol.NeutralMode;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -23,9 +25,10 @@ import org.usfirst.frc.team4537.robot.subsystems.ExampleSubsystem;
  * project.
  */
 public class Robot extends TimedRobot {
-	public static final ExampleSubsystem kExampleSubsystem
-			= new ExampleSubsystem();
-	public static OI m_oi;
+	public static final ExampleSubsystem kExampleSubsystem = new ExampleSubsystem();
+	public static final DriveBase driveBase = new DriveBase();
+	public static final Telemetry telemetry = new Telemetry();
+	public static OI oi;
 
 	Command m_autonomousCommand;
 	SendableChooser<Command> m_chooser = new SendableChooser<>();
@@ -36,10 +39,15 @@ public class Robot extends TimedRobot {
 	 */
 	@Override
 	public void robotInit() {
-		m_oi = new OI();
+//		driveBase = new DriveBase();
+//		telemetry = new Telemetry();
+		oi = new OI();
 		m_chooser.addDefault("Default Auto", new ExampleCommand());
 		// chooser.addObject("My Auto", new MyAutoCommand());
 		SmartDashboard.putData("Auto mode", m_chooser);
+		
+//		SmartDashboard.putData("Drive", new DriveArcade());
+		SmartDashboard.putData("Scheduler", Scheduler.getInstance());
 	}
 
 	/**
@@ -49,7 +57,7 @@ public class Robot extends TimedRobot {
 	 */
 	@Override
 	public void disabledInit() {
-
+		driveBase.setAllNeutralMode(NeutralMode.Coast);
 	}
 
 	@Override
@@ -70,6 +78,7 @@ public class Robot extends TimedRobot {
 	 */
 	@Override
 	public void autonomousInit() {
+		driveBase.setAllNeutralMode(NeutralMode.Brake);
 		m_autonomousCommand = m_chooser.getSelected();
 
 		/*
@@ -95,6 +104,7 @@ public class Robot extends TimedRobot {
 
 	@Override
 	public void teleopInit() {
+		driveBase.setAllNeutralMode(NeutralMode.Brake);
 		// This makes sure that the autonomous stops running when
 		// teleop starts running. If you want the autonomous to
 		// continue until interrupted by another command, remove

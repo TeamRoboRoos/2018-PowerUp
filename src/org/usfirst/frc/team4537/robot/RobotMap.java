@@ -7,6 +7,8 @@
 
 package org.usfirst.frc.team4537.robot;
 
+import com.ctre.phoenix.motorcontrol.ControlMode;
+
 /**
  * The RobotMap is a mapping from the ports sensors and actuators are wired into
  * to a variable name. This provides flexibility changing wiring, makes checking
@@ -23,4 +25,41 @@ public class RobotMap {
 	// number and the module. For example you with a rangefinder:
 	// public static int rangefinderPort = 1;
 	// public static int rangefinderModule = 1;
+	
+	//Controller IDs and axis mappings
+	//Drive controller
+	public static final int CONTROL_DRIVE_0 = 0;
+	public static final int CONTROL_DRIVE_0_X = 0;
+	public static final int CONTROL_DRIVE_0_Y = 1;
+	public static final int CONTROL_DRIVE_0_Z = 2;
+	public static final int CONTROL_DRIVE_0_T = 3;
+	//Operator controller
+	public static final int CONTROL_OPERATE_0 = 1;
+	public static final int CONTROL_OPERATE_0_X0 = 0;
+	public static final int CONTROL_OPERATE_0_Y0 = 1;
+	public static final int CONTROL_OPERATE_0_X1 = 2;
+	public static final int CONTROL_OPERATE_0_Y1 = 3;
+	
+	//Controller button mappings
+	//Drive controller
+	//Operator controller
+	
+	//CAN IDs
+	//TalonSRX IDs
+	public static final int CAN_MOTOR_DL_1 = 1;
+	public static final int CAN_MOTOR_DL_2 = 2;
+	public static final int CAN_MOTOR_DL_3 = 3;
+	public static final int CAN_MOTOR_DR_4 = 4;
+	public static final int CAN_MOTOR_DR_5 = 5;
+	public static final int CAN_MOTOR_DR_6 = 6;
+	//Module IDs
+	public static final int CAN_PDP_0 = 0;
+	public static final int CAN_PCM_0 = 7;
+	
+	//PCM Ports
+	public static final int PCM_ARM_0 = 0;
+	public static final int PCM_ARM_1 = 1;
+	
+	//Robot Maximum Speed
+	public static final int ROBOT_MAX_SPEED = 3702;
 }
