@@ -48,6 +48,8 @@ public class RecordData extends Command {
     	Robot.telemetry.logger.updateSensor("encR", enc[1]);
     	Robot.telemetry.logger.updateSensor("velL", vel[0]);
     	Robot.telemetry.logger.updateSensor("velR", vel[1]);
+    	
+    	Robot.telemetry.logger.updateSensor("btn1", Robot.oi.getDriveRawButton(1));
     }
 
     // Make this return true when this Command no longer needs to run execute()

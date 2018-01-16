@@ -17,7 +17,7 @@ public class Logger {
 	private ArrayList<String> sensors = new ArrayList<String>();
 	private ArrayList<String> data = new ArrayList<String>();
 	private long autoLogDelay = 250;
-	private String logDirectory = "\\home\\lvuser\\logs\\"; //"C:\\Users\\bryce\\Desktop\\FRC\\logs\\";
+	private String logDirectory = "/home/lvuser/logs/"; //"C:\\Users\\bryce\\Desktop\\FRC\\logs\\";
 
 	/**
 	 * @param sensorsin Array of sensors to log
@@ -38,8 +38,8 @@ public class Logger {
 		}
 
 		//Write to file
-		System.out.println(logFileName);
-		System.out.println(header);
+		System.out.println(logFileName);//XXX
+		System.out.println(header);//XXX
 		appendFile(logFileName, header);
 	}
 
@@ -231,7 +231,6 @@ public class Logger {
 			log += ","+data.get(i);
 		}
 		if(log.length() > 0) {
-//			System.out.println(log);
 			appendFile(logFileName, log);
 		}
 	}

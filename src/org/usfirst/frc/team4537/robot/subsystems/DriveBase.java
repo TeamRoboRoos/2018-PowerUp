@@ -11,20 +11,23 @@ import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.command.Subsystem;
+import utilities.MotionProfile;
 
 /**
  *
  */
 public class DriveBase extends Subsystem {
 	
-	private TalonSRX leftMaster;
+	public TalonSRX leftMaster;
 	private TalonSRX leftSlave1;
-	private TalonSRX leftSlave2;
+//	private TalonSRX leftSlave2;
 	private TalonSRX rightMaster;
 	private TalonSRX rightSlave1;
-	private TalonSRX rightSlave2;
+//	private TalonSRX rightSlave2;
 	
 	private int direction = 1;
+	
+	public MotionProfile profile;
 
 	public DriveBase() {
     	//Initialize Motor Controllers
@@ -36,18 +39,19 @@ public class DriveBase extends Subsystem {
     	leftSlave1.set(ControlMode.Follower, leftMaster.getDeviceID());
     	leftSlave1.setInverted(true);
     	
-    	leftSlave2 = new TalonSRX(RobotMap.CAN_MOTOR_DL_3);
-    	leftSlave2.set(ControlMode.Follower, leftMaster.getDeviceID());
-    	leftSlave2.setInverted(true);
+//    	leftSlave2 = new TalonSRX(RobotMap.CAN_MOTOR_DL_3);
+//    	leftSlave2.set(ControlMode.Follower, leftMaster.getDeviceID());
+//    	leftSlave2.setInverted(true);
     	
     	rightMaster = new TalonSRX(RobotMap.CAN_MOTOR_DR_4);
-    	rightMaster.set(ControlMode.PercentOutput, 0.0);
+//    	rightMaster.set(ControlMode.PercentOutput, 0.0);
+    	rightMaster.set(ControlMode.Follower, leftMaster.getDeviceID());
     	
     	rightSlave1 = new TalonSRX(RobotMap.CAN_MOTOR_DR_5);
     	rightSlave1.set(ControlMode.Follower, rightMaster.getDeviceID());
     	
-    	rightSlave2 = new TalonSRX(RobotMap.CAN_MOTOR_DR_6);
-    	rightSlave2.set(ControlMode.Follower, rightMaster.getDeviceID());
+//    	rightSlave2 = new TalonSRX(RobotMap.CAN_MOTOR_DR_6);
+//    	rightSlave2.set(ControlMode.Follower, rightMaster.getDeviceID());
     	
 
     	/* first choose the sensor */ 
@@ -65,7 +69,8 @@ public class DriveBase extends Subsystem {
     	leftMaster.config_kP(0, 0.2, 10); 
     	leftMaster.config_kI(0, 0, 10);  
     	leftMaster.config_kD(0, 0, 10); 
-
+    	
+    	profile = new MotionProfile(leftMaster);
 	}
 	
     public void initDefaultCommand() {
@@ -76,10 +81,10 @@ public class DriveBase extends Subsystem {
     public void setAllNeutralMode(NeutralMode mode) {
     	leftMaster.setNeutralMode(mode);
     	leftSlave1.setNeutralMode(mode);
-    	leftSlave2.setNeutralMode(mode);
+//    	leftSlave2.setNeutralMode(mode);
     	rightMaster.setNeutralMode(mode);
     	rightSlave1.setNeutralMode(mode);
-    	rightSlave2.setNeutralMode(mode);
+//    	rightSlave2.setNeutralMode(mode);
     }
     
     /**
@@ -90,6 +95,7 @@ public class DriveBase extends Subsystem {
     	//Convert to %robot velocity
     	leftValue *= RobotMap.ROBOT_MAX_SPEED;
 		leftMaster.set(ControlMode.Velocity, leftValue);
+//		leftMaster.set(ControlMode.PercentOutput, leftValue);
     }
     
     /**
@@ -99,7 +105,8 @@ public class DriveBase extends Subsystem {
     public void setRightMotor(double rightValue) {
     	//Convert to %robot velocity
 //    	rightValue *= RobotMap.ROBOT_MAX_SPEED;
-		rightMaster.set(ControlMode.PercentOutput, rightValue);
+//		rightMaster.set(ControlMode.Velocity, rightValue);
+//		rightMaster.set(ControlMode.PercentOutput, rightValue);
     }
     
     /**
@@ -113,7 +120,7 @@ public class DriveBase extends Subsystem {
     }
     
     public int[] getEncoderDistances() {
-    	System.out.println(rightMaster.getSensorCollection().getQuadraturePosition() +" "+ rightSlave1.getSensorCollection().getQuadraturePosition() +" "+ leftMaster.getSensorCollection().getQuadraturePosition() +" "+ leftSlave1.getSensorCollection().getQuadraturePosition());
+//    	System.out.println(rightMaster.getSensorCollection().getQuadraturePosition() +" "+ rightSlave1.getSensorCollection().getQuadraturePosition() +" "+ leftMaster.getSensorCollection().getQuadraturePosition() +" "+ leftSlave1.getSensorCollection().getQuadraturePosition());
     	return new int[] {leftMaster.getSensorCollection().getQuadraturePosition(), rightMaster.getSensorCollection().getQuadraturePosition()};
     }
     

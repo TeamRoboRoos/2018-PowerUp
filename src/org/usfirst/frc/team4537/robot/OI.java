@@ -53,4 +53,8 @@ public class OI {
 	public double getDriveRawAxis(int axis) {
 		return controlDrive.getRawAxis(axis);
 	}
+	
+	public boolean getDriveRawButton(int button) {
+		return controlDrive.getRawButton(button);
+	}
 }

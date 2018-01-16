@@ -15,7 +15,8 @@ public class Telemetry extends Subsystem {
 			"encL",
 			"encR",
 			"velL",
-			"velR"
+			"velR",
+			"btn1"
 	};
 	
     public Telemetry() {
