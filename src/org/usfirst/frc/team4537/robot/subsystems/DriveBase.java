@@ -9,8 +9,10 @@ import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 
-import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.Utility;
 import edu.wpi.first.wpilibj.command.Subsystem;
+import edu.wpi.first.wpilibj.livewindow.LiveWindow;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import utilities.MotionProfile;
 
 /**
@@ -26,56 +28,81 @@ public class DriveBase extends Subsystem {
 //	private TalonSRX rightSlave2;
 	
 	private int direction = 1;
+	private NeutralMode neutralMode = NeutralMode.Coast; 
 	
-	public MotionProfile profile;
+	public MotionProfile profileLeft;
 
 	public DriveBase() {
     	//Initialize Motor Controllers
 		leftMaster = new TalonSRX(RobotMap.CAN_MOTOR_DL_1);
     	leftMaster.set(ControlMode.PercentOutput, 0.0);
-    	leftMaster.setInverted(true);
+    	leftMaster.configClosedloopRamp(0.2, 10); 
+    	leftMaster.setSensorPhase(true);
+    	leftMaster.setInverted(false);
     	
     	leftSlave1 = new TalonSRX(RobotMap.CAN_MOTOR_DL_2);
     	leftSlave1.set(ControlMode.Follower, leftMaster.getDeviceID());
-    	leftSlave1.setInverted(true);
+    	leftSlave1.setInverted(leftMaster.getInverted());
     	
 //    	leftSlave2 = new TalonSRX(RobotMap.CAN_MOTOR_DL_3);
 //    	leftSlave2.set(ControlMode.Follower, leftMaster.getDeviceID());
-//    	leftSlave2.setInverted(true);
+//    	leftSlave2.setInverted(leftMaster.getInverted());
     	
     	rightMaster = new TalonSRX(RobotMap.CAN_MOTOR_DR_4);
-//    	rightMaster.set(ControlMode.PercentOutput, 0.0);
-    	rightMaster.set(ControlMode.Follower, leftMaster.getDeviceID());
+    	rightMaster.set(ControlMode.PercentOutput, 0.0);
+    	rightMaster.configClosedloopRamp(0.2, 10); 
+    	rightMaster.setSensorPhase(true);
+    	rightMaster.setInverted(true);
     	
     	rightSlave1 = new TalonSRX(RobotMap.CAN_MOTOR_DR_5);
     	rightSlave1.set(ControlMode.Follower, rightMaster.getDeviceID());
+    	rightSlave1.setInverted(rightMaster.getInverted());
     	
 //    	rightSlave2 = new TalonSRX(RobotMap.CAN_MOTOR_DR_6);
 //    	rightSlave2.set(ControlMode.Follower, rightMaster.getDeviceID());
+//    	rightSlave2.setInverted(rightMaster.getInverted());
     	
-
-    	/* first choose the sensor */ 
-    	leftMaster.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, 0, 10); 
-    	leftMaster.setSensorPhase(true); 
+    	/* Left Side */
+    	/* first choose the sensor */
+    	leftMaster.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, 0, 10);
+    	leftMaster.getSensorCollection().setQuadraturePosition(0, 10);
 
     	/* set the peak and nominal outputs, 12V means full */ 
-    	leftMaster.configNominalOutputForward(0, 10); 
+    	leftMaster.configNominalOutputForward(0, 10);
     	leftMaster.configNominalOutputReverse(0, 10); 
-    	leftMaster.configPeakOutputForward(1, 10); 
+    	leftMaster.configPeakOutputForward(1, 10);
     	leftMaster.configPeakOutputReverse(-1, 10); 
 
-    	/* set closed loop gains in slot0 */ 
+    	/* set closed loop gains in slot0 */
     	leftMaster.config_kF(0, 0.34, 10); 
-    	leftMaster.config_kP(0, 0.2, 10); 
-    	leftMaster.config_kI(0, 0, 10);  
-    	leftMaster.config_kD(0, 0, 10); 
+    	leftMaster.config_kP(0, 0.2, 10);
+    	leftMaster.config_kI(0, 0, 10);
+    	leftMaster.config_kD(0, 0, 10);
+
+    	/* Right Side */
+    	/* first choose the sensor */
+    	rightMaster.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, 0, 10);
+    	rightMaster.getSensorCollection().setQuadraturePosition(0, 10);
+
+    	/* set the peak and nominal outputs, 12V means full */ 
+    	rightMaster.configNominalOutputForward(0, 10);
+    	rightMaster.configNominalOutputReverse(0, 10); 
+    	rightMaster.configPeakOutputForward(1, 10);
+    	rightMaster.configPeakOutputReverse(-1, 10); 
+
+    	/* set closed loop gains in slot0 */
+    	rightMaster.config_kF(0, 0.34, 10); 
+    	rightMaster.config_kP(0, 0.2, 10);
+    	rightMaster.config_kI(0, 0, 10);
+    	rightMaster.config_kD(0, 0, 10);
     	
-    	profile = new MotionProfile(leftMaster);
+    	profileLeft = new MotionProfile(leftMaster, utilities.Functions.readProfileFile("testprofile2.csv"));
 	}
 	
     public void initDefaultCommand() {
         // Set the default command for a subsystem here.
         setDefaultCommand(new DriveArcade());
+        SmartDashboard.putNumber("PID_Right", 4);
     }
     
     public void setAllNeutralMode(NeutralMode mode) {
@@ -85,6 +112,11 @@ public class DriveBase extends Subsystem {
     	rightMaster.setNeutralMode(mode);
     	rightSlave1.setNeutralMode(mode);
 //    	rightSlave2.setNeutralMode(mode);
+    	neutralMode = mode;
+    }
+    
+    public boolean getAllNeutralMode() {
+    	return neutralMode == NeutralMode.Coast ? true : false;
     }
     
     /**
@@ -104,8 +136,8 @@ public class DriveBase extends Subsystem {
      */
     public void setRightMotor(double rightValue) {
     	//Convert to %robot velocity
-//    	rightValue *= RobotMap.ROBOT_MAX_SPEED;
-//		rightMaster.set(ControlMode.Velocity, rightValue);
+    	rightValue *= RobotMap.ROBOT_MAX_SPEED;
+		rightMaster.set(ControlMode.Velocity, rightValue);
 //		rightMaster.set(ControlMode.PercentOutput, rightValue);
     }
     
@@ -120,7 +152,6 @@ public class DriveBase extends Subsystem {
     }
     
     public int[] getEncoderDistances() {
-//    	System.out.println(rightMaster.getSensorCollection().getQuadraturePosition() +" "+ rightSlave1.getSensorCollection().getQuadraturePosition() +" "+ leftMaster.getSensorCollection().getQuadraturePosition() +" "+ leftSlave1.getSensorCollection().getQuadraturePosition());
     	return new int[] {leftMaster.getSensorCollection().getQuadraturePosition(), rightMaster.getSensorCollection().getQuadraturePosition()};
     }
     
@@ -137,7 +168,7 @@ public class DriveBase extends Subsystem {
      * @param squaredInputs If set, decreases the sensitivity at low speeds
      */
     public void arcadeDrive(double speed, double turn, boolean squaredInputs){
-		double moveValue = speed * direction;
+		double moveValue = speed;// * direction;
 		double rotateValue = turn;
 		int moveSign = (int)(moveValue/Math.abs(moveValue));
 		int rotateSign = (int)(rotateValue/Math.abs(rotateValue));

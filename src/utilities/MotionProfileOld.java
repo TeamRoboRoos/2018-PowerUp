@@ -1,39 +1,15 @@
 package utilities;
 
-/**
- * Example logic for firing and managing motion profiles.
- * This example sends MPs, waits for them to finish
- * Although this code uses a CANTalon, nowhere in this module do we changeMode() or call set() to change the output.
- * This is done in Robot.java to demonstrate how to change control modes on the fly.
- * 
- * The only routines we call on Talon are....
- * 
- * changeMotionControlFramePeriod
- * 
- * getMotionProfileStatus		
- * clearMotionProfileHasUnderrun     to get status and potentially clear the error flag.
- * 
- * pushMotionProfileTrajectory
- * clearMotionProfileTrajectories
- * processMotionProfileBuffer,   to push/clear, and process the trajectory points.
- * 
- * getControlMode, to check if we are in Motion Profile Control mode.
- * 
- * Example of advanced features not demonstrated here...
- * [1] Calling pushMotionProfileTrajectory() continuously while the Talon executes the motion profile, thereby keeping it going indefinitely.
- * [2] Instead of setting the sensor position to zero at the start of each MP, the program could offset the MP's position based on current position. 
- */
-
-
-import com.ctre.phoenix.motorcontrol.ControlMode;
-import com.ctre.phoenix.motorcontrol.can.*;
-
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.Notifier;
-import com.ctre.phoenix.motion.*;
+import com.ctre.phoenix.motion.MotionProfileStatus;
+import com.ctre.phoenix.motion.SetValueMotionProfile;
+import com.ctre.phoenix.motion.TrajectoryPoint;
 import com.ctre.phoenix.motion.TrajectoryPoint.TrajectoryDuration;
+import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 
-public class MotionProfile {
+import utilities.MotionProfileOld.PeriodicRunnable;
+
+public class MotionProfileOld {
 
 	/**
 	 * The status of the motion profile executer and buffer inside the Talon.
@@ -88,8 +64,6 @@ public class MotionProfile {
 	 */
 	private static final int kNumLoopsTimeout = 10;
 	
-	private static double[][] _profile;
-	
 	/**
 	 * Lets create a periodic task to funnel our trajectory points into our talon.
 	 * It doesn't need to be very accurate, just needs to keep pace with the motion
@@ -102,7 +76,7 @@ public class MotionProfile {
 	class PeriodicRunnable implements java.lang.Runnable {
 	    public void run() {  _talon.processMotionProfileBuffer();    }
 	}
-	Notifier _notifer = new Notifier(new PeriodicRunnable());
+//	Notifier _notifer = new Notifier(new PeriodicRunnable());
 	
 
 	/**
@@ -111,15 +85,14 @@ public class MotionProfile {
 	 * @param talon
 	 *            reference to Talon object to fetch motion profile status from.
 	 */
-	public MotionProfile(TalonSRX talon, double[][] profile) {
-		_profile = profile;
+	public MotionProfileOld(TalonSRX talon) {
 		_talon = talon;
 		/*
 		 * since our MP is 10ms per point, set the control frame rate and the
 		 * notifer to half that
 		 */
 		_talon.changeMotionControlFramePeriod(5);
-		_notifer.startPeriodic(0.005);
+//		_notifer.startPeriodic(0.005);
 	}
 
 	/**
@@ -204,6 +177,7 @@ public class MotionProfile {
 						 * points
 						 */
 					/* do we have a minimum numberof points in Talon */
+					System.out.println(_status.btmBufferCnt);
 					if (_status.btmBufferCnt > kMinPointsInTalon) {
 						/* start (once) the motion profile */
 						_setValue = SetValueMotionProfile.Enable;
@@ -261,22 +235,19 @@ public class MotionProfile {
 		retval = retval.valueOf(durationMs);
 		/* check that it is valid */
 		if (retval.value != durationMs) {
-			DriverStation.reportError("Trajectory Duration not supported - use configMotionProfileTrajectoryPeriod instead", false);		
+//			DriverStation.reportError("Trajectory Duration not supported - use configMotionProfileTrajectoryPeriod instead", false);		
 		}
 		/* pass to caller */
 		return retval;
 	}
-//	/** Start filling the MPs to all of the involved Talons. */
-//	private void startFilling() {
-//		/* since this example only has one talon, just update that one */
-//		//startFilling(GeneratedMotionProfile.Points, GeneratedMotionProfile.kNumPoints);
-//		startFilling(_profile);
-//	}
-
-//	private void startFilling(double[][] profile) {
+	/** Start filling the MPs to all of the involved Talons. */
 	private void startFilling() {
-		double[][] profile = _profile;
-		int totalCnt = profile.length;
+		/* since this example only has one talon, just update that one */
+		startFilling(GeneratedMotionProfile.Points, GeneratedMotionProfile.kNumPoints);
+	}
+
+	private void startFilling(double[][] profile, int totalCnt) {
+
 		/* create an empty point */
 		TrajectoryPoint point = new TrajectoryPoint();
 
@@ -297,15 +268,15 @@ public class MotionProfile {
 		_talon.clearMotionProfileTrajectories();
 
 		/* set the base trajectory period to zero, use the individual trajectory period below */
-		_talon.configMotionProfileTrajectoryPeriod(0, 10);
+//		_talon.configMotionProfileTrajectoryPeriod(10, 10);
 		
 		/* This is fast since it's just into our TOP buffer */
 		for (int i = 0; i < totalCnt; ++i) {
 			double positionRot = profile[i][0];
 			double velocityRPM = profile[i][1];
 			/* for each point, fill our structure and pass it to API */
-			point.position = positionRot;// * 4096; //Convert Revolutions to Units XXX
-			point.velocity = velocityRPM;// * 4096 / 600.0; //Convert RPM to Units/100ms XXX
+			point.position = positionRot * 4096; //Convert Revolutions to Units
+			point.velocity = velocityRPM * 4096 / 600.0; //Convert RPM to Units/100ms
 			point.headingDeg = 0; /* future feature - not used in this example*/
 			point.profileSlotSelect0 = 0; /* which set of gains would you like to use [0,3]? */
 			point.profileSlotSelect1 = 0; /* future feature  - not used in this example - cascaded PID [0,1], leave zero */
@@ -317,8 +288,13 @@ public class MotionProfile {
 			point.isLastPoint = false;
 			if ((i + 1) == totalCnt)
 				point.isLastPoint = true; /* set this to true on the last point  */
-
+			
+			MotionProfileStatus tempSt = new MotionProfileStatus();
+			_talon.getMotionProfileStatus(tempSt);
+			System.out.println("1: "+tempSt.topBufferCnt);
 			_talon.pushMotionProfileTrajectory(point);
+			_talon.getMotionProfileStatus(tempSt);
+			System.out.println("2: "+tempSt.topBufferCnt);
 		}
 	}
 	/**

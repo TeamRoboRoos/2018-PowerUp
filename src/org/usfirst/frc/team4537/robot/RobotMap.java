@@ -16,15 +16,10 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
  * floating around.
  */
 public class RobotMap {
-	// For example to map the left and right motors, you could define the
-	// following variables to use with your drivetrain subsystem.
-	// public static int leftMotor = 1;
-	// public static int rightMotor = 2;
-
-	// If you are using multiple modules, make sure to define both the port
-	// number and the module. For example you with a rangefinder:
-	// public static int rangefinderPort = 1;
-	// public static int rangefinderModule = 1;
+	
+	//Logger
+	public static final boolean LOGGER_ENABLE = false;
+	public static final int LOGGER_DELAY = 10;
 	
 	//Controller IDs and axis mappings
 	//Drive controller
@@ -44,6 +39,14 @@ public class RobotMap {
 	//Drive controller
 	//Operator controller
 	
+	//Camera server variables
+	public static final String[] CAM_NAMES = {"Front"};//, "Gear"};
+	public static final String[] CAM_PATHS = {"/dev/video0"};//, "/dev/video1"};
+	public static final int[] CAM_RESOLUTION = {160, 120}; //{Width, Height}
+	public static final int CAM_FPS = 30;
+	public static final int CAM_EX = 50;
+	public static final int CAM_WB = 50;
+	
 	//CAN IDs
 	//TalonSRX IDs
 	public static final int CAN_MOTOR_DL_1 = 1;
@@ -57,9 +60,12 @@ public class RobotMap {
 	public static final int CAN_PCM_0 = 7;
 	
 	//PCM Ports
-	public static final int PCM_ARM_0 = 0;
-	public static final int PCM_ARM_1 = 1;
+	public static final int PCM_ARM_BOTTOM = 0;
+	public static final int PCM_ARM_TOP = 1;
 	
 	//Robot Maximum Speed
 	public static final int ROBOT_MAX_SPEED = 3702;
+	
+	//Digital and Analog ports
+	public static final int ANI_PRESSURE = 0;
 }

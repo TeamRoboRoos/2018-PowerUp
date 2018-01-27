@@ -1,6 +1,9 @@
 package org.usfirst.frc.team4537.robot.commands;
 
 import org.usfirst.frc.team4537.robot.Robot;
+import org.usfirst.frc.team4537.robot.RobotMap;
+
+import com.ctre.phoenix.motorcontrol.NeutralMode;
 
 import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -17,11 +20,11 @@ public class RecordData extends Command {
         // eg. requires(chassis);
     	requires(Robot.telemetry);
     }
+    
 
     // Called just before this Command runs the first time
     protected void initialize() {
     	setRunWhenDisabled(true);
-    	Robot.telemetry.logger.startAutoLog();
     }
 
     // Called repeatedly when this Command is scheduled to run
@@ -36,6 +39,12 @@ public class RecordData extends Command {
     			valsMax[i] = vals[i];
     		}
     	}
+    	
+    	if(Robot.telemetry.getUserButton()) {
+    		if(!Robot.driveBase.getAllNeutralMode()) {
+    			Robot.driveBase.setAllNeutralMode(NeutralMode.Coast);
+    		}
+    	}
 
     	SmartDashboard.putNumber("encL", enc[0]);
     	SmartDashboard.putNumber("encR", enc[1]);
@@ -43,6 +52,10 @@ public class RecordData extends Command {
     	SmartDashboard.putNumber("velR", vel[1]);
     	
     	SmartDashboard.putNumber("velL_MAX", valsMax[2]);
+
+    	SmartDashboard.putNumber("EncA", Robot.driveBase.leftMaster.getSensorCollection().getPulseWidthPosition());
+    	
+    	SmartDashboard.putBoolean("UserButton", Robot.telemetry.getUserButton());
     	
     	Robot.telemetry.logger.updateSensor("encL", enc[0]);
     	Robot.telemetry.logger.updateSensor("encR", enc[1]);
@@ -50,6 +63,10 @@ public class RecordData extends Command {
     	Robot.telemetry.logger.updateSensor("velR", vel[1]);
     	
     	Robot.telemetry.logger.updateSensor("btn1", Robot.oi.getDriveRawButton(1));
+
+    	if(RobotMap.LOGGER_ENABLE) {
+        	Robot.telemetry.logger.log();
+    	}
     }
 
     // Make this return true when this Command no longer needs to run execute()
@@ -59,12 +76,10 @@ public class RecordData extends Command {
 
     // Called once after isFinished returns true
     protected void end() {
-    	Robot.telemetry.logger.stopAutoLog();
     }
 
     // Called when another command which requires one or more of the same
     // subsystems is scheduled to run
     protected void interrupted() {
-    	end();
     }
 }

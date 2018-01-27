@@ -13,7 +13,8 @@ import edu.wpi.first.wpilibj.command.Command;
  */
 public class DriveArcade extends Command {
 
-	boolean bLast = false;
+	private boolean bLast = false;
+	private boolean MP = false;
 	
     public DriveArcade() {
         // Use requires() here to declare subsystem dependencies
@@ -27,25 +28,28 @@ public class DriveArcade extends Command {
     
     // Called repeatedly when this Command is scheduled to run
     protected void execute() {
-    	double fwd = Robot.oi.getDriveRawAxis(RobotMap.CONTROL_DRIVE_0_Y);
-    	double rot = Robot.oi.getDriveRawAxis(RobotMap.CONTROL_DRIVE_0_Z);
+    	double fwd = -Robot.oi.getDriveRawAxis(RobotMap.CONTROL_DRIVE_0_Y) * 0.8;
+    	double rot = -Robot.oi.getDriveRawAxis(RobotMap.CONTROL_DRIVE_0_Z) * 0.8 * 0.8;
     	
-//    	Robot.driveBase.arcadeDrive(fwd, rot, true);
-//    	Robot.driveBase.setLeftRightMotors(fwd, fwd);
     	
-    	Robot.driveBase.profile.control();
-    	boolean b = Robot.oi.getDriveRawButton(2);
-    	
-    	if(b) {
-    		SetValueMotionProfile setOutput = Robot.driveBase.profile.getSetValue();
-    		Robot.driveBase.leftMaster.set(ControlMode.MotionProfile, setOutput.value);
-    		if(b && !bLast) {
-    			Robot.driveBase.profile.startMotionProfile();
+    	if(!MP) {
+    		Robot.driveBase.arcadeDrive(fwd, rot, true);
+    	} else {
+    		Robot.driveBase.profileLeft.control();
+    		boolean b = Robot.oi.getDriveRawButton(2);
+
+    		if(b) {
+//    			Robot.driveBase.profile.reset();
+    			SetValueMotionProfile setOutput = Robot.driveBase.profileLeft.getSetValue();
+    			System.out.println(setOutput.toString());//XXX
+    			Robot.driveBase.leftMaster.set(ControlMode.MotionProfile, setOutput.value);
+    			if(b && !bLast) {
+    				Robot.driveBase.profileLeft.startMotionProfile();
+    			}
     		}
+
+    		bLast = b;
     	}
-    	
-    	bLast = b;
-    	
     }
 
     // Make this return true when this Command no longer needs to run execute()
@@ -60,6 +64,6 @@ public class DriveArcade extends Command {
     // Called when another command which requires one or more of the same
     // subsystems is scheduled to run
     protected void interrupted() {
-    	Robot.driveBase.profile.reset();
+    	Robot.driveBase.profileLeft.reset();
     }
 }

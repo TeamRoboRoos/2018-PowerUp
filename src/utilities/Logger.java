@@ -16,13 +16,27 @@ public class Logger {
 
 	private ArrayList<String> sensors = new ArrayList<String>();
 	private ArrayList<String> data = new ArrayList<String>();
-	private long autoLogDelay = 250;
-	private String logDirectory = "/home/lvuser/logs/"; //"C:\\Users\\bryce\\Desktop\\FRC\\logs\\";
+	private long logWriteDelay = 5000;
+	private long logDelay;
+	private long logTimer = 0;
+	private String writeData = "";
+	private boolean doWrite = false;
+	private String logDirectory = "/home/lvuser/logs/";
+
+	private FileWriter file;
+	private BufferedWriter buffer;
+	private PrintWriter writer;
+	
+	private String logBuffer = "";
+	private int logBufferLen = 0;
+	private long lastTime = 0;
 
 	/**
 	 * @param sensorsin Array of sensors to log
+	 * @param loggerDelay 
 	 */
-	public Logger(String[] sensorsin) {
+	public Logger(String[] sensorsin, int loggerDelay, boolean enable) {
+		logDelay = loggerDelay;
 		//Create Sensors
 		for(int i=0;i < sensorsin.length; i++) {
 			addSensor(sensorsin[i]);
@@ -32,27 +46,43 @@ public class Logger {
 		logFileName = logDirectory+"log-"+sdf2.format(System.currentTimeMillis())+".csv";
 		
 		//Create header
-		String header = "Time";
+		String header = "Time,Delay";
 		for(int i=0; sensors.size()>i; i++) {
 			header += ","+sensors.get(i);
 		}
 
 		//Write to file
+		try {
+			file = new FileWriter(logFileName, true);
+			buffer = new BufferedWriter(file);
+			writer = new PrintWriter(buffer);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
 		System.out.println(logFileName);//XXX
 		System.out.println(header);//XXX
 		appendFile(logFileName, header);
+		
+		if(enable) {
+			writerThread.start();
+		}
 	}
 
 	/**
-	 * Thread for auto logging
+	 * Thread for writing log to file
 	 */
-	private Thread autoLogger = new Thread(() -> {
-		long timer = 0;
-		long delay = autoLogDelay;
+	private Thread writerThread = new Thread(() -> {
 		while(!Thread.interrupted()) {
-			if(System.currentTimeMillis() > timer+delay) {
-				log();
-				timer = System.currentTimeMillis();
+			if(doWrite) {
+				writer.println(writeData);
+				System.out.println("Written");//XXX
+				doWrite = false;
+			}
+			try {
+				Thread.sleep(1000);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
 			}
 		}
 	});
@@ -62,27 +92,14 @@ public class Logger {
 	 * @param path of file
 	 * @return <b>FileWriter</b> object from path
 	 */
-	private boolean appendFile(String path, String data) {
-		FileWriter file = null;
-		BufferedWriter buffer = null;
-		PrintWriter writer= null;
-		try {
-			file = new FileWriter(path, true);
-			buffer = new BufferedWriter(file);
-			writer = new PrintWriter(buffer);
-			writer.println(data);
-			return true;
-		}
-		catch(IOException e) {
-			return false;
-		}
-		finally {
-			try{
-				if(buffer != null) {
-					buffer.close();
-				}
-			}
-			catch (IOException e) {}
+	private void appendFile(String path, String data) {		
+		logBufferLen++;
+		if(logBufferLen%(logWriteDelay/logDelay) == 0) {
+			writeData = logBuffer+data;
+			doWrite = true;
+			logBuffer = "";
+		} else {
+			logBuffer += data+"\n";
 		}
 	}
 
@@ -99,22 +116,6 @@ public class Logger {
 			else return false;
 		}
 		else return true;
-	}
-
-	/**
-	 * Removes a sensor from the logger
-	 * @param sensor to remove
-	 * @return <b>true</b> if removed or never existed, <b>false</b> if failed
-	 * @deprecated
-	 */
-	public boolean removeSensor(String sensor) {
-		if(sensors.contains(sensor)) {
-			data.remove(sensor.indexOf(sensor));
-			sensors.remove(sensor);
-			if(!sensors.contains(sensor)) return true;
-			else return false;
-		}
-		return true;
 	}
 
 	/**
@@ -193,45 +194,22 @@ public class Logger {
 	}
 
 	/**
-	 * Starts auto logger thread with custom delay
-	 * @param delay to set in milliseconds
-	 * @return <b>true</b> if started, <b>false</b> if already running
-	 */
-	public boolean startAutoLog(long delay) {
-		autoLogDelay = delay;
-		return startAutoLog();
-	}
-
-	/**
-	 * Starts auto logger with default delay of 250ms
-	 * @return <b>true</b> if started, <b>false</b> if already running
-	 */
-	public boolean startAutoLog() {
-		if(!autoLogger.isAlive()) {
-			autoLogger.start();
-			return true;
-		}
-		else return false;
-	}
-
-	/**
-	 * Stops auto logger
-	 */
-	public void stopAutoLog() {
-		autoLogger.interrupt();
-	}
-
-	/**
 	 * Logs to file
 	 */
-	private void log() {
-		String log = sdf1.format(System.currentTimeMillis());
+	public void log() {
+		if(System.currentTimeMillis() > logTimer+logDelay) {
+			long currTime = System.currentTimeMillis();
+			String log = sdf1.format(currTime); //Current Time
+			log += "," + Long.toString(currTime - lastTime); //Delay
+			lastTime = currTime;
 
-		for(int i=0; sensors.size()>i; i++) {
-			log += ","+data.get(i);
-		}
-		if(log.length() > 0) {
-			appendFile(logFileName, log);
+			for(int i=0; sensors.size()>i; i++) {
+				log += ","+data.get(i);
+			}
+			if(log.length() > 0) {
+				appendFile(logFileName, log);
+			}
+			logTimer = System.currentTimeMillis();
 		}
 	}
 }

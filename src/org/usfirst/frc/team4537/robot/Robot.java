@@ -7,6 +7,8 @@
 
 package org.usfirst.frc.team4537.robot;
 
+import edu.wpi.cscore.UsbCamera;
+import edu.wpi.first.wpilibj.CameraServer;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.command.Scheduler;
@@ -30,8 +32,11 @@ public class Robot extends TimedRobot {
 	public static final Telemetry telemetry = new Telemetry();
 	public static OI oi;
 
+	UsbCamera[] camObjs = new UsbCamera[RobotMap.CAM_NAMES.length];
 	Command m_autonomousCommand;
 	SendableChooser<Command> m_chooser = new SendableChooser<>();
+	
+	Command recordData;
 
 	/**
 	 * This function is run when the robot is first started up and should be
@@ -39,15 +44,28 @@ public class Robot extends TimedRobot {
 	 */
 	@Override
 	public void robotInit() {
-//		driveBase = new DriveBase();
-//		telemetry = new Telemetry();
 		oi = new OI();
 		m_chooser.addDefault("Default Auto", new ExampleCommand());
 		// chooser.addObject("My Auto", new MyAutoCommand());
 		SmartDashboard.putData("Auto mode", m_chooser);
 		
-//		SmartDashboard.putData("Drive", new DriveArcade());
+		SmartDashboard.putData("DriveBase", driveBase);
+		SmartDashboard.putData("Telemetry", telemetry);
 		SmartDashboard.putData("Scheduler", Scheduler.getInstance());
+		
+		//Initialize camera capture servers
+		for (int i = 0; i <= RobotMap.CAM_NAMES.length-1; i++) {
+			UsbCamera camObj = CameraServer.getInstance().startAutomaticCapture(RobotMap.CAM_NAMES[i], RobotMap.CAM_PATHS[i]);
+			camObjs[i] = camObj;
+			camObj.setResolution(RobotMap.CAM_RESOLUTION[0], RobotMap.CAM_RESOLUTION[1]);
+			camObj.setFPS(RobotMap.CAM_FPS);
+			//camObj.setExposureManual(RobotMap.CAM_EX);
+			//camObj.setWhiteBalanceManual(RobotMap.CAM_WB);
+			camObj.setExposureAuto();
+			camObj.setWhiteBalanceAuto();
+		}
+		
+		recordData = new RecordData();
 	}
 
 	/**
@@ -57,7 +75,8 @@ public class Robot extends TimedRobot {
 	 */
 	@Override
 	public void disabledInit() {
-		driveBase.setAllNeutralMode(NeutralMode.Coast);
+		driveBase.setAllNeutralMode(NeutralMode.Brake);
+		recordData.start();
 	}
 
 	@Override
@@ -78,7 +97,7 @@ public class Robot extends TimedRobot {
 	 */
 	@Override
 	public void autonomousInit() {
-		driveBase.setAllNeutralMode(NeutralMode.Brake);
+		driveBase.setAllNeutralMode(NeutralMode.Coast);
 		m_autonomousCommand = m_chooser.getSelected();
 
 		/*
@@ -104,11 +123,11 @@ public class Robot extends TimedRobot {
 
 	@Override
 	public void teleopInit() {
-		driveBase.setAllNeutralMode(NeutralMode.Brake);
+		driveBase.setAllNeutralMode(NeutralMode.Coast);
 		// This makes sure that the autonomous stops running when
 		// teleop starts running. If you want the autonomous to
 		// continue until interrupted by another command, remove
-		// this line or comment it out.
+		// this line or comment it out.		
 		if (m_autonomousCommand != null) {
 			m_autonomousCommand.cancel();
 		}
