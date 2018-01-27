@@ -4,28 +4,32 @@ enum class AnimationType { //enums let us give names to different states.
   blink,
   fade,
   carnival,
-  ripple,
+  rippleReverse,
   rainbowCycle,
-  rainbowRandom
+  rainbowRandom,
+  rippleCentre,
+  rippleForwards  
 }; //Creates a list of our animations.
 
 static AnimationType animations[] = {
-  AnimationType::blackout,      //0
-  AnimationType::solidColor,    //1
-  AnimationType::blink,         //2
-  AnimationType::fade,          //3
-  AnimationType::carnival,      //4
-  AnimationType::ripple,        //5
-  AnimationType::rainbowCycle,  //6
-  AnimationType::rainbowRandom  //7
+  AnimationType::blackout,          //0
+  AnimationType::solidColor,        //1
+  AnimationType::blink,             //2
+  AnimationType::fade,              //3
+  AnimationType::carnival,          //4
+  AnimationType::rippleReverse,     //5
+  AnimationType::rainbowCycle,      //6
+  AnimationType::rainbowRandom,     //7
+  AnimationType::rippleCentre,      //8
+  AnimationType::rippleForwards,    //9
 };
 
 class LedStrip { //A class is a group of other data and functions.
   private:
-    int r = 255, g = 255, b = 255;
+    int r = 255, g = 0, b = 0;
     int from, to;
     Adafruit_NeoPixel obj;
-    AnimationType currentAnimation = animations[3];
+    AnimationType currentAnimation = animations[6];
     long lastTime = 0; //Used in animations
   protected: // protected members can only be accessed by this class or other classes that inherit it.
   public:
@@ -38,9 +42,11 @@ class LedStrip { //A class is a group of other data and functions.
     void fade(int wavelength);
     void blink(int wait);
     void carnival(int wait);
-    void ripple(byte magnitude, byte wait);
+    void rippleReverse(byte magnitude, byte wait);
     void rainbowCycle(byte brightness, int wait);
     void rainbowRandom(byte brightness, int wait);
+    void rippleCentre(byte magnitude, byte wait);
+    void rippleForwards(byte magnitude, byte wait);
 };
 
 char incoming1, incoming2, incoming3; // 3 single characters. will store the information on the serial port to be processed.

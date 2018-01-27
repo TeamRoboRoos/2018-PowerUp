@@ -7,7 +7,7 @@ static bool controlCheck = true; //Set to true to check to ignore CL/NL characte
 //Physical strips attached to sepperate data pins
 static Adafruit_NeoPixel ledObjs[] = {Adafruit_NeoPixel(15, 2, NEO_GRB + NEO_KHZ800), Adafruit_NeoPixel(15, 3, NEO_GRB + NEO_KHZ800)};
 //Strip segments in software, they are a part of the above strips
-static LedStrip ledStrips[] = {LedStrip(ledObjs[0], 0, 14), LedStrip(ledObjs[1], 0, 14)};//, LedStrip(ledObjs[1], 10, 14), LedStrip(ledObjs[0], 10, 14)};
+static LedStrip ledStrips[] = {LedStrip(ledObjs[0], 0, 14), LedStrip(ledObjs[1], 0, 14)};//, LedStrip(ledObjs[0], 0, 0), LedStrip(ledObjs[0], 13, 14)};
 
 static int numLedObjs = sizeof(ledObjs) / sizeof(ledObjs[0]); //Number of software objects, these are parts of physical strips
 static int numLedStrips = sizeof(ledStrips) / sizeof(ledStrips[0]); //Number of physical strips
@@ -46,7 +46,7 @@ void loop() {
         if (incoming3 != '~') { //Check the third character is not the control character
 
           if (charMode) {
-            sel = incoming2 - '0'; //Make the character a diget
+            sel = incoming2 - '0'; //Make the character a digit
             sel2 = incoming3 - '0';
           }
           else {
@@ -146,11 +146,11 @@ void LedStrip::animate() {
       break;
 
     case AnimationType::carnival:
-      this->carnival(80);
+      this->carnival(60);
       break;
 
-    case AnimationType::ripple:
-      this->ripple(8, 25);
+    case AnimationType::rippleReverse:
+      this->rippleReverse(6, 60); //magnitude (changes how big the animation is) :: wait (changes how long between each LED flash)
       break;
 
     case AnimationType::rainbowCycle:
@@ -159,6 +159,14 @@ void LedStrip::animate() {
 
     case AnimationType::rainbowRandom:
       this->rainbowRandom(255, 75);
+      break;
+
+    case AnimationType::rippleCentre:
+      this->rippleCentre(8, 100);
+      break;
+    
+    case AnimationType::rippleForwards:
+      this->rippleForwards(6, 60);
       break;
   }
 }

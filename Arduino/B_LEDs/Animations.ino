@@ -46,7 +46,7 @@ void LedStrip::carnival(int wait) {
   }
 }
 
-void LedStrip::ripple(byte magnitude, byte wait)
+void LedStrip::rippleReverse(byte magnitude, byte wait)
 {
   static unsigned long timer = millis();
   unsigned int f = (millis() - timer) / wait;
@@ -83,6 +83,141 @@ void LedStrip::rainbowRandom(byte brightness, int wait) {
       int randint = random(255);
       this->obj.setPixelColor(i + this->from, wheelBrightness(randint, brightness));
       lastTime = millis();
+    }
+  }
+}
+
+void LedStrip::rippleCentre(byte magnitude, byte wait)
+{
+  int startLED = this->from;
+  int endLED = this->to;
+  
+  //for (int i = 0; i + startLED < endLED + 1; i++) { //steps through each pixel on the strip
+  //  this->obj.setPixelColor(startLED + i, 0, 255, 0); //and paints them in the color you told it to.
+  //}
+  //this->obj.show(); //after all pixels have been told what to do, the strip displays the changes.
+
+  static unsigned long timer = millis();
+  unsigned int frames = (millis() - timer) / wait;
+  
+  int s = ((frames % (magnitude * 2)) - (magnitude * 2) + 2) * -1;
+  
+  // DOES LEFT HALF
+  for (int p = 0; p < (this->numPixels() / 2) + (2 * magnitude) - 2; p += (2 * magnitude)) {
+    for (int i = 0; i < magnitude; i++) {
+      if ((p + i - s) >= 0 && p + i - s < (this->numPixels() / 2)) {
+
+        int currentLED = p + i - s;
+        
+        this->obj.setPixelColor(startLED + currentLED, this->obj.Color((i * r) / magnitude, (i * g) / magnitude, (i * b) / magnitude));
+        this->obj.setPixelColor(endLED   - currentLED, this->obj.Color((i * r) / magnitude, (i * g) / magnitude, (i * b) / magnitude));
+      }
+    }
+    /*
+    for (int i = magnitude; i > 0; i--) {
+      if ((p - s + ((magnitude * 2) - i)) >= 0 && (p - s + ((magnitude * 2) - i)) < (this->numPixels() / 2)) {
+
+        int currentLED = (p - s + ((magnitude * 2) - i));
+        
+        this->obj.setPixelColor(startLED + currentLED, this->obj.Color((i * r) / magnitude, (i * g) / magnitude, (i * b) / magnitude));
+        this->obj.setPixelColor(endLED   - currentLED, this->obj.Color((i * r) / magnitude, (i * g) / magnitude, (i * b) / magnitude));
+      }
+    }
+    */
+  }
+
+/*
+  
+//DOES RIGHT HALF
+  for (int p = 0; p < (this->numPixels()) + (2 * magnitude) - 2; p += (2 * magnitude)) {
+    for (int i = 0; i < magnitude; i++) {
+      if ((p + i - (s *-1)) >= (this->numPixels() / 2) && p + i - (s *-1) < (this->numPixels())) {
+        this->obj.setPixelColor(p + i - (s *-1) + this->from, this->obj.Color((i * r) / magnitude, (i * g) / magnitude, (i * b) / magnitude));
+      }
+    }
+    for (int i = magnitude; i > 0; i--) {
+      if ((p - (s *-1) + ((magnitude * 2) - i)) >= 0 && (p - (s *-1) + ((magnitude * 2) - i)) < (this->numPixels())) {
+        this->obj.setPixelColor((p - (s *-1) + ((magnitude * 2) - i)) + this->from + (this->numPixels()), this->obj.Color((i * r) / magnitude, (i * g) / magnitude, (i * b) / magnitude));
+      }
+    }
+  }
+*/
+  /*
+  static unsigned long timer = millis();
+  unsigned int f = (millis() - timer) / wait;
+
+  int s = ((f % (magnitude * 2)) - (magnitude * 2) + 2) * -1;
+
+// DOES LEFT HALF
+  for (int p = 0; p < (this->numPixels() / 2) + (2 * magnitude) - 2; p += (2 * magnitude)) {
+    for (int i = 0; i < magnitude; i++) {
+      if ((p + i - s) >= 0 && p + i - s < (this->numPixels() / 2)) {
+        this->obj.setPixelColor(p + i - s + this->from, this->obj.Color((i * r) / magnitude, (i * g) / magnitude, (i * b) / magnitude));
+      }
+    }
+    for (int i = magnitude; i > 0; i--) {
+      if ((p - s + ((magnitude * 2) - i)) >= 0 && (p - s + ((magnitude * 2) - i)) < (this->numPixels() / 2)) {
+        this->obj.setPixelColor((p - s + ((magnitude * 2) - i)) + this->from, this->obj.Color((i * r) / magnitude, (i * g) / magnitude, (i * b) / magnitude));
+      }
+    }
+  }
+
+
+//DOES RIGHT HALF
+  for (int p = 0; p < (this->numPixels()) + (2 * magnitude) - 2; p += (2 * magnitude)) {
+    for (int i = 0; i < magnitude; i++) {
+      if ((p + i - (s *-1)) >= (this->numPixels() / 2) && p + i - (s *-1) < (this->numPixels())) {
+        this->obj.setPixelColor(p + i - (s *-1) + this->from, this->obj.Color((i * r) / magnitude, (i * g) / magnitude, (i * b) / magnitude));
+      }
+    }
+    for (int i = magnitude; i > 0; i--) {
+      if ((p - (s *-1) + ((magnitude * 2) - i)) >= 0 && (p - (s *-1) + ((magnitude * 2) - i)) < (this->numPixels())) {
+        this->obj.setPixelColor((p - (s *-1) + ((magnitude * 2) - i)) + this->from + (this->numPixels()), this->obj.Color((i * r) / magnitude, (i * g) / magnitude, (i * b) / magnitude));
+      }
+    }
+  }
+  */
+}
+
+
+//{ THE BOUNCE EFFECT
+//  static unsigned long timer = millis();
+//  unsigned int f = (millis() - timer) / wait;
+//
+//  int s = ((f % (magnitude * 2)) - (magnitude * 2) + 2) * -1;
+//
+//  for (int p = 0; p < this->numPixels() + (2 * magnitude) - 2; p += (2 * magnitude)) {
+//    for (int i = 0; i < magnitude; i++) {
+//      if ((p + i - (s *-1)) >= 0 && p + i - (s *-1) < this->numPixels()) {
+//        this->obj.setPixelColor(p + i - (s *-1) + this->from, this->obj.Color((i * r) / magnitude, (i * g) / magnitude, (i * b) / magnitude));
+//      }
+//    }
+//    for (int i = magnitude; i > 0; i--) {
+//      if ((p - s + ((magnitude * 2) - i)) >= 0 && (p - s + ((magnitude * 2) - i)) < this->numPixels()) {
+//        this->obj.setPixelColor((p - s + ((magnitude * 2) - i)) + this->from, this->obj.Color((i * r) / magnitude, (i * g) / magnitude, (i * b) / magnitude));
+//      }
+//    }
+//  }
+//}
+
+
+void LedStrip::rippleForwards(byte magnitude, byte wait)
+{
+  static unsigned long timer = millis();
+  unsigned int f = (millis() - timer) / wait;
+
+  int s = ((f % (magnitude * 2)) - (magnitude * 2) + 2) * -1;
+
+  for (int p = 0; p < this->numPixels() + (2 * magnitude) - 2; p += (2 * magnitude)) {
+    for (int i = 0; i < magnitude; i++) {
+      if ((p + i - s) >= 0 && p + i - s < this->numPixels()) {
+        this->obj.setPixelColor(p + i - s + this->from, this->obj.Color((i * r) / magnitude, (i * g) / magnitude, (i * b) / magnitude));
+      }
+    }
+    for (int i = magnitude; i > 0; i--) {
+      if ((p - s + ((magnitude * 2) - i)) >= 0 && (p - s + ((magnitude * 2) - i)) < this->numPixels()) {
+        this->obj.setPixelColor((p - s + ((magnitude * 2) - i)) + this->from, this->obj.Color((i * r) / magnitude, (i * g) / magnitude, (i * b) / magnitude));
+      }
     }
   }
 }
