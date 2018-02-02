@@ -5,7 +5,9 @@ import org.usfirst.frc.team4537.robot.RobotMap;
 
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.command.Command;
+import edu.wpi.first.wpilibj.command.Scheduler;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /**
@@ -13,9 +15,11 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  */
 public class RecordData extends Command {
 
+	private DriverStation ds = DriverStation.getInstance();
 	private int[] valsMax = {0,0,0,0};
 	
     public RecordData() {
+    	setRunWhenDisabled(true);
         // Use requires() here to declare subsystem dependencies
         // eg. requires(chassis);
     	requires(Robot.telemetry);
@@ -24,7 +28,6 @@ public class RecordData extends Command {
 
     // Called just before this Command runs the first time
     protected void initialize() {
-    	setRunWhenDisabled(true);
     }
 
     // Called repeatedly when this Command is scheduled to run
@@ -51,11 +54,19 @@ public class RecordData extends Command {
     	SmartDashboard.putNumber("velL", vel[0]);
     	SmartDashboard.putNumber("velR", vel[1]);
     	
-    	SmartDashboard.putNumber("velL_MAX", valsMax[2]);
+    	SmartDashboard.putNumber("Time Remaining", ds.getMatchTime());
+    	SmartDashboard.putString("GameData", ds.getGameSpecificMessage());
+    	double matchTime = DriverStation.getInstance().getMatchTime();
+    	boolean opControl = DriverStation.getInstance().isOperatorControl();
+    	boolean endGame = matchTime <= 30;
+    	boolean teleopStarted = matchTime != -1;
+    	SmartDashboard.putBoolean("EndGame", opControl && endGame && teleopStarted);
 
     	SmartDashboard.putNumber("EncA", Robot.driveBase.leftMaster.getSensorCollection().getPulseWidthPosition());
     	
     	SmartDashboard.putBoolean("UserButton", Robot.telemetry.getUserButton());
+    	
+    	SmartDashboard.putNumber("PressureV", Robot.arm.pressureGet());
     	
     	Robot.telemetry.logger.updateSensor("encL", enc[0]);
     	Robot.telemetry.logger.updateSensor("encR", enc[1]);

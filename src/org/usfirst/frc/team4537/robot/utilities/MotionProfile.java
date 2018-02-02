@@ -1,4 +1,4 @@
-package utilities;
+package org.usfirst.frc.team4537.robot.utilities;
 
 /**
  * Example logic for firing and managing motion profiles.

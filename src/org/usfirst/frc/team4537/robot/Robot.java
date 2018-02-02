@@ -9,12 +9,14 @@ package org.usfirst.frc.team4537.robot;
 
 import edu.wpi.cscore.UsbCamera;
 import edu.wpi.first.wpilibj.CameraServer;
+import edu.wpi.first.wpilibj.PowerDistributionPanel;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.command.Scheduler;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import org.usfirst.frc.team4537.robot.commands.*;
+import org.usfirst.frc.team4537.robot.enums.LEDCodes;
 import org.usfirst.frc.team4537.robot.subsystems.*;
 
 import com.ctre.phoenix.motorcontrol.NeutralMode;
@@ -29,10 +31,11 @@ import com.ctre.phoenix.motorcontrol.NeutralMode;
 public class Robot extends TimedRobot {
 	public static final ExampleSubsystem kExampleSubsystem = new ExampleSubsystem();
 	public static final DriveBase driveBase = new DriveBase();
+	public static final Arm arm = new Arm();
 	public static final Telemetry telemetry = new Telemetry();
+	public static final Arduino arduino = new Arduino();
 	public static OI oi;
 
-	UsbCamera[] camObjs = new UsbCamera[RobotMap.CAM_NAMES.length];
 	Command m_autonomousCommand;
 	SendableChooser<Command> m_chooser = new SendableChooser<>();
 	
@@ -46,26 +49,15 @@ public class Robot extends TimedRobot {
 	public void robotInit() {
 		oi = new OI();
 		m_chooser.addDefault("Default Auto", new ExampleCommand());
-		// chooser.addObject("My Auto", new MyAutoCommand());
 		SmartDashboard.putData("Auto mode", m_chooser);
 		
 		SmartDashboard.putData("DriveBase", driveBase);
 		SmartDashboard.putData("Telemetry", telemetry);
 		SmartDashboard.putData("Scheduler", Scheduler.getInstance());
 		
-		//Initialize camera capture servers
-		for (int i = 0; i <= RobotMap.CAM_NAMES.length-1; i++) {
-			UsbCamera camObj = CameraServer.getInstance().startAutomaticCapture(RobotMap.CAM_NAMES[i], RobotMap.CAM_PATHS[i]);
-			camObjs[i] = camObj;
-			camObj.setResolution(RobotMap.CAM_RESOLUTION[0], RobotMap.CAM_RESOLUTION[1]);
-			camObj.setFPS(RobotMap.CAM_FPS);
-			//camObj.setExposureManual(RobotMap.CAM_EX);
-			//camObj.setWhiteBalanceManual(RobotMap.CAM_WB);
-			camObj.setExposureAuto();
-			camObj.setWhiteBalanceAuto();
-		}
+		SmartDashboard.putData("SetLights", new SetLightsSDB());
 		
-		recordData = new RecordData();
+//		recordData = new RecordData();
 	}
 
 	/**
@@ -76,7 +68,8 @@ public class Robot extends TimedRobot {
 	@Override
 	public void disabledInit() {
 		driveBase.setAllNeutralMode(NeutralMode.Brake);
-		recordData.start();
+		arduino.setLights(LEDCodes.m_animation, 0, LEDCodes.a_blackout);
+		arduino.setLights(LEDCodes.m_colour, 0, LEDCodes.c_yellow);
 	}
 
 	@Override
@@ -98,6 +91,8 @@ public class Robot extends TimedRobot {
 	@Override
 	public void autonomousInit() {
 		driveBase.setAllNeutralMode(NeutralMode.Coast);
+		arduino.setLights(LEDCodes.m_animation, 0, LEDCodes.a_fade);
+		arduino.setLights(LEDCodes.m_colour, 0, LEDCodes.c_yellow);
 		m_autonomousCommand = m_chooser.getSelected();
 
 		/*
@@ -123,6 +118,8 @@ public class Robot extends TimedRobot {
 
 	@Override
 	public void teleopInit() {
+		arduino.setLights(LEDCodes.m_animation, 0, LEDCodes.a_carnival);
+		arduino.setLights(LEDCodes.m_colour, 0, LEDCodes.c_green);
 		driveBase.setAllNeutralMode(NeutralMode.Coast);
 		// This makes sure that the autonomous stops running when
 		// teleop starts running. If you want the autonomous to
@@ -141,6 +138,10 @@ public class Robot extends TimedRobot {
 		Scheduler.getInstance().run();
 	}
 
+	public void testInit() {
+		arduino.setLights(LEDCodes.m_animation, 0, LEDCodes.a_rippleReverse);
+		arduino.setLights(LEDCodes.m_colour, 0, LEDCodes.c_teal);
+	}
 	/**
 	 * This function is called periodically during test mode.
 	 */

@@ -42,7 +42,7 @@ public class RobotMap {
 	//Camera server variables
 	public static final String[] CAM_NAMES = {"Front"};//, "Gear"};
 	public static final String[] CAM_PATHS = {"/dev/video0"};//, "/dev/video1"};
-	public static final int[] CAM_RESOLUTION = {160, 120}; //{Width, Height}
+	public static final int[] CAM_RESOLUTION = {160, 120};  //{Width, Height}
 	public static final int CAM_FPS = 30;
 	public static final int CAM_EX = 50;
 	public static final int CAM_WB = 50;
@@ -68,4 +68,8 @@ public class RobotMap {
 	
 	//Digital and Analog ports
 	public static final int ANI_PRESSURE = 0;
+	
+	//Serial Configuration
+	public static final SerialPort.Port ARD_PORT = SerialPort.Port.kMXP;
+	public static final int ARD_BAUDR = 9600;
 }

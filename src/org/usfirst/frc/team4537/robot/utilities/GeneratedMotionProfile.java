@@ -1,4 +1,4 @@
-package utilities;
+package org.usfirst.frc.team4537.robot.utilities;
 
 public class GeneratedMotionProfile {
 	// Position (rotations) Velocity (RPM) Duration (ms)

@@ -7,8 +7,11 @@
 
 package org.usfirst.frc.team4537.robot;
 
+import org.usfirst.frc.team4537.robot.commands.*;
+import org.usfirst.frc.team4537.robot.enums.LEDCodes;
+import org.usfirst.frc.team4537.robot.triggers.*;
+
 import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.buttons.Button;
 
 /**
@@ -46,10 +49,13 @@ public class OI {
 	
 	private Joystick controlDrive;
 //	private Joystick controlOperate;
+	private EndGame endGame;
 	
 	public OI() {
 		controlDrive = new Joystick(RobotMap.CONTROL_DRIVE_0);
 //		controlOperate = new Joystick(RobotMap.CONTROL_OPERATE_0);
+		endGame = new EndGame();
+		endGame.whenActive(new SetLights(new int[]{0,1,2,3}, LEDCodes.a_blink, LEDCodes.c_orange));
 	}
 	
 	public double getDriveRawAxis(int axis) {

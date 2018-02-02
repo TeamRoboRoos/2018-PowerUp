@@ -3,6 +3,7 @@ package org.usfirst.frc.team4537.robot.subsystems;
 import org.usfirst.frc.team4537.robot.Robot;
 import org.usfirst.frc.team4537.robot.RobotMap;
 import org.usfirst.frc.team4537.robot.commands.DriveArcade;
+import org.usfirst.frc.team4537.robot.utilities.MotionProfile;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
@@ -13,7 +14,6 @@ import edu.wpi.first.wpilibj.Utility;
 import edu.wpi.first.wpilibj.command.Subsystem;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import utilities.MotionProfile;
 
 /**
  *
@@ -96,7 +96,7 @@ public class DriveBase extends Subsystem {
     	rightMaster.config_kI(0, 0, 10);
     	rightMaster.config_kD(0, 0, 10);
     	
-    	profileLeft = new MotionProfile(leftMaster, utilities.Functions.readProfileFile("testprofile2.csv"));
+    	profileLeft = new MotionProfile(leftMaster, org.usfirst.frc.team4537.robot.utilities.Functions.readProfileFile("testprofile2.csv"));
 	}
 	
     public void initDefaultCommand() {

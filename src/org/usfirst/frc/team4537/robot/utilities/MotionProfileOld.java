@@ -1,4 +1,4 @@
-package utilities;
+package org.usfirst.frc.team4537.robot.utilities;
 
 import com.ctre.phoenix.motion.MotionProfileStatus;
 import com.ctre.phoenix.motion.SetValueMotionProfile;
@@ -6,8 +6,6 @@ import com.ctre.phoenix.motion.TrajectoryPoint;
 import com.ctre.phoenix.motion.TrajectoryPoint.TrajectoryDuration;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
-
-import utilities.MotionProfileOld.PeriodicRunnable;
 
 public class MotionProfileOld {
 

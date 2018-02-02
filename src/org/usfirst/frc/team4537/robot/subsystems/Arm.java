@@ -61,8 +61,7 @@ public class Arm extends Subsystem {
     	return compressor.getPressureSwitchValue();
     }
     
-//    public double pressureGet() {
-//    	return 
-//    }
+    public double pressureGet() {
+    	return 250 * (pressureSens.getVoltage() / 4.90722606) - 25; 
+    }
 }
-
