@@ -9,6 +9,10 @@ package org.usfirst.frc.team4537.robot;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 
+import edu.wpi.first.wpilibj.I2C;
+import edu.wpi.first.wpilibj.SPI;
+import edu.wpi.first.wpilibj.SerialPort;
+
 /**
  * The RobotMap is a mapping from the ports sensors and actuators are wired into
  * to a variable name. This provides flexibility changing wiring, makes checking
@@ -72,4 +76,7 @@ public class RobotMap {
 	//Serial Configuration
 	public static final SerialPort.Port ARD_PORT = SerialPort.Port.kMXP;
 	public static final int ARD_BAUDR = 9600;
+	
+	//NavX Setup
+	public static final SPI.Port NAVX_PORT = SPI.Port.kMXP;
 }
