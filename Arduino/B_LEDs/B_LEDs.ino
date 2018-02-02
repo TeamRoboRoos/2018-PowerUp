@@ -3,15 +3,15 @@
 
 static bool charMode = true; //Set to true to look for chars on serial instead of ints, excludes control character
 static bool controlCheck = true; //Set to true to check to ignore CL/NL characters
+static bool rioMode = true; //Set to work with rio (bytes instead of chars)
 
-//Physical strips attached to sepperate data pins
-static Adafruit_NeoPixel ledObjs[] = {Adafruit_NeoPixel(15, 2, NEO_GRB + NEO_KHZ800), Adafruit_NeoPixel(15, 3, NEO_GRB + NEO_KHZ800)};
-//Strip segments in software, they are a part of the above strips
-static LedStrip ledStrips[] = {LedStrip(ledObjs[0], 0, 14), LedStrip(ledObjs[1], 0, 14)};//, LedStrip(ledObjs[0], 0, 0), LedStrip(ledObjs[0], 13, 14)};
+//Physical strips attached to sepperate data pins //NumLEDs, Pin, Code
+static Adafruit_NeoPixel ledObjs[] = {Adafruit_NeoPixel(30, 3, NEO_GRB + NEO_KHZ800)};//, Adafruit_NeoPixel(15, 3, NEO_GRB + NEO_KHZ800)};
+//Strip segments in software, they are a part of the above strips //StripNum, FromLED, ToLED
+static LedStrip ledStrips[] = {LedStrip(ledObjs[0], 0, 29)};//, LedStrip(ledObjs[0], 15, 18), LedStrip(ledObjs[0], 19, 24), LedStrip(ledObjs[0], 25, 29)};
 
 static int numLedObjs = sizeof(ledObjs) / sizeof(ledObjs[0]); //Number of software objects, these are parts of physical strips
 static int numLedStrips = sizeof(ledStrips) / sizeof(ledStrips[0]); //Number of physical strips
-static int numAnimations = sizeof(animations) / sizeof(animations[0]); //Number of animations that can be run on the strips
 //---------------------------------------------------------------
 
 void setup() {
@@ -19,81 +19,48 @@ void setup() {
     ledObjs[i].begin();
     ledObjs[i].show();
   }
-
-  Serial.begin(9600);
+  Serial.begin(9600);//9600
   Serial.println("COMPLETE");
   randomSeed(analogRead(0));
 }
 
 void loop() {
-  if (Serial.available() > 2) { //Check there are at least 3 characters in the buffer
-    incoming1 = Serial.read();
-    Serial.println(incoming1);
-    if (incoming1 == '~') { //Check the first character is the control character
-      incoming2 = Serial.read();
-      if (incoming2 == 13 && controlCheck) {
-        Serial.read();
-        incoming2 = Serial.read();
-      }
-      Serial.println(incoming2);
-      if (incoming2 != '~') { //Check the second character is not the control character
-        incoming3 = Serial.read();
-        if (incoming3 == 13 && controlCheck) {
-          Serial.read();
-          incoming3 = Serial.read();
-        }
-        Serial.println(incoming3);
-        if (incoming3 != '~') { //Check the third character is not the control character
-
-          if (charMode) {
-            sel = incoming2 - '0'; //Make the character a digit
-            sel2 = incoming3 - '0';
-          }
-          else {
-            sel = incoming2;
-            sel2 = incoming3;
-          }
-
-          if (sel2 <= 9) {
-            ledStrips[sel].switchAnimation(animations[sel2]);
-          }
-
-          switch (incoming3) {
-            case 'R': //will run if incoming = 'R'
-              ledStrips[sel].setRGB(255, 0, 0);
-              break; //ends the case.
-
-            case 'G': //will rin if incoming = 'G'
-              ledStrips[sel].setRGB(0, 255, 0);
-              break; //ends the case.
-
-            case 'B': //will run if incoming = 'B'
-              ledStrips[sel].setRGB(0, 0, 255);
-              break; //ends the case.
-
-            case 'Y': //will run if incoming = 'Y'
-              ledStrips[sel].setRGB(126, 84, 0);
-              break; //ends the case.
-
-            case 'O': //will run if incoming = 'O'
-              ledStrips[sel].setRGB(158, 63, 0);
-              break; //ends the case.
-
-            case 'T': //will run if incoming = 'T'
-              ledStrips[sel].setRGB(0, 127, 127);
-              break; //ends the case.
-
-            case 'V': //will run if incoming = 'V'
-              ledStrips[sel].setRGB(127, 0, 127);
-              break; //ends the case.
-
-            case 'W': //will run if incoming = 'W'
-              ledStrips[sel].setRGB(255, 255, 255);
-              break; //ends the case.
-          }
-        }
-      }
+  if (Serial.available() > 0) {
+    if (complete) {
+      Serial.println("NEW");
+      msgMode = Serial.read();
+      Serial.println(msgMode);
+      complete = false;
     }
+    if (msgMode == 0 && Serial.available() > 1) {
+      msgStrip = Serial.read();
+      msgAni = Serial.read();
+      Serial.println(msgStrip);
+      Serial.println(msgAni);
+      complete = true;
+      newCmd = true;
+    }
+    if (msgMode == 1 && Serial.available() > 3) {
+      msgStrip = Serial.read();
+      msgR = Serial.read();
+      msgG = Serial.read();
+      msgB = Serial.read();
+      Serial.println(msgR);
+      Serial.println(msgG);
+      Serial.println(msgB);
+      complete = true;
+      newCmd = true;
+    }
+  }
+
+  if (newCmd) {
+    if (msgMode == 0) {
+      ledStrips[msgStrip].switchAnimation(AnimationType(msgAni));
+    }
+    if (msgMode == 1) {
+      ledStrips[msgStrip].setRGB(msgR, msgG, msgB);
+    }
+    newCmd = false;
   }
 
   for (int i = 0; i < numLedStrips; i++) {
@@ -146,7 +113,7 @@ void LedStrip::animate() {
       break;
 
     case AnimationType::carnival:
-      this->carnival(60);
+      this->carnival(80);
       break;
 
     case AnimationType::rippleReverse:
