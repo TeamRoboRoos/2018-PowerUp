@@ -25,6 +25,12 @@ public class RobotMap {
 	public static final boolean LOGGER_ENABLE = false;
 	public static final int LOGGER_DELAY = 10;
 	
+	//Drive parameters
+	//Arcade drive velocity control? true = %velocity, false = %output
+	public static final boolean DRIVE_VEL = true;
+	//Operator speed limit
+	public static final double DRIVE_OPP_LIMIT = 0.8;
+	
 	//Controller IDs and axis mappings
 	//Drive controller
 	public static final int CONTROL_DRIVE_0 = 0;
@@ -44,7 +50,7 @@ public class RobotMap {
 	//Operator controller
 	
 	//Camera server variables
-	public static final String[] CAM_NAMES = {"Front"};//, "Gear"};
+	public static final String[] CAM_NAMES = {};//{"Front"};//, "Gear"};
 	public static final String[] CAM_PATHS = {"/dev/video0"};//, "/dev/video1"};
 	public static final int[] CAM_RESOLUTION = {160, 120};  //{Width, Height}
 	public static final int CAM_FPS = 30;
@@ -59,24 +65,43 @@ public class RobotMap {
 	public static final int CAN_MOTOR_DR_4 = 4;
 	public static final int CAN_MOTOR_DR_5 = 5;
 	public static final int CAN_MOTOR_DR_6 = 6;
+	public static final int CAN_MOTOR_ARM = 7;
 	//Module IDs
 	public static final int CAN_PDP_0 = 0;
-	public static final int CAN_PCM_0 = 7;
+	public static final int CAN_PCM_0 = 8;
+	
+	//PWM IDs
+	//Grabbers
+	public static final int PWM_MOTOR_GRAB_L = 1;
+	public static final int PWM_MOTOR_GRAB_R = 2;
+	//Climbers
+	public static final int PWM_MOTOR_CLIMB_1 = 3;
+	public static final int PWM_MOTOR_CLIMB_2 = 4;
 	
 	//PCM Ports
 	public static final int PCM_ARM_BOTTOM = 0;
 	public static final int PCM_ARM_TOP = 1;
 	
+	//Pressure Voltage at 0psi 
+	public static final double PRES_V = 0.490722606;
+	
+	//Arm setup
+	//Arm gear ratio
+	public static final double ARM_GEAR_RATIO = 42/15;
+	
 	//Robot Maximum Speed
-	public static final int ROBOT_MAX_SPEED = 3702;
+	public static final int ROBOT_MAX_SPEED = 3702; //Revolutions per 100ms
 	
 	//Digital and Analog ports
 	public static final int ANI_PRESSURE = 0;
 	
-	//Serial Configuration
+	//Arduino Configuration
+	//Port
 	public static final SerialPort.Port ARD_PORT = SerialPort.Port.kMXP;
+	//Baud Rate
 	public static final int ARD_BAUDR = 9600;
 	
 	//NavX Setup
+	//Port
 	public static final SPI.Port NAVX_PORT = SPI.Port.kMXP;
 }

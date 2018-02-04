@@ -99,15 +99,15 @@ public class Functions {
 	
 	public static double[][] readProfileFile(String filePath) {
 		filePath = "/home/lvuser/profiles/" + filePath;
-		System.out.println("RAN!");
+//		System.out.println("RAN!");//XXX
 		ArrayList<double[]> profileList = new ArrayList<double[]>();
 		Path path = Paths.get(filePath);
-		System.out.println("RAN! 2");
+//		System.out.println("RAN! 2");//XXX
 		try(BufferedReader br = Files.newBufferedReader(path, StandardCharsets.US_ASCII)) {
 			String line = br.readLine();
 			while(line != null) {
 				String[] values = line.split(",");
-				System.out.println("RAN! 3");
+//				System.out.println("RAN! 3");//XXX
 				profileList.add(new double[] {Double.parseDouble(values[0]), Double.parseDouble(values[1]), Double.parseDouble(values[2])});
 				line = br.readLine();
 			}
@@ -115,7 +115,7 @@ public class Functions {
 			e.printStackTrace();
 		}
 
-		System.out.println("RAN! 4");
+//		System.out.println("RAN! 4");//XXX
 		int listSize = profileList.size();
 		double[][] profile = new double[listSize][3];
 		for(int i=0; i < listSize; i++) {
@@ -123,7 +123,7 @@ public class Functions {
 			profile[i][1] = profileList.get(i)[1];
 			profile[i][2] = profileList.get(i)[2];
 		}
-		System.out.println("RAN! 5");
+//		System.out.println("RAN! 5");//XXX
 		return profile;
 	}
 }

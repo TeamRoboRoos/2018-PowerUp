@@ -49,6 +49,13 @@ public class RecordData extends Command {
     		}
     	}
 
+    	SmartDashboard.putData("DriveBase", Robot.driveBase);
+		SmartDashboard.putData("Arm", Robot.arm);
+		SmartDashboard.putData("Grabber", Robot.grabber);
+		SmartDashboard.putData("Telemetry", Robot.telemetry);
+		SmartDashboard.putData("Arduino", Robot.arduino);
+		SmartDashboard.putData("Scheduler", Scheduler.getInstance());
+		
     	SmartDashboard.putNumber("encL", enc[0]);
     	SmartDashboard.putNumber("encR", enc[1]);
     	SmartDashboard.putNumber("velL", vel[0]);

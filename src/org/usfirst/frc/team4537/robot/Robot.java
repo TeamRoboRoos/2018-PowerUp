@@ -32,13 +32,14 @@ public class Robot extends TimedRobot {
 	public static final ExampleSubsystem kExampleSubsystem = new ExampleSubsystem();
 	public static final DriveBase driveBase = new DriveBase();
 	public static final Arm arm = new Arm();
+	public static final Grabber grabber = new Grabber();
 	public static final Telemetry telemetry = new Telemetry();
 	public static final Arduino arduino = new Arduino();
 	public static OI oi;
 
 	Command m_autonomousCommand;
 	SendableChooser<Command> m_chooser = new SendableChooser<>();
-	
+
 	Command recordData;
 
 	/**
@@ -48,16 +49,11 @@ public class Robot extends TimedRobot {
 	@Override
 	public void robotInit() {
 		oi = new OI();
-		m_chooser.addDefault("Default Auto", new ExampleCommand());
+		m_chooser.addDefault("Auto Encoder Baseline", new AutoLineEnc());
 		SmartDashboard.putData("Auto mode", m_chooser);
-		
-		SmartDashboard.putData("DriveBase", driveBase);
-		SmartDashboard.putData("Telemetry", telemetry);
-		SmartDashboard.putData("Scheduler", Scheduler.getInstance());
-		
+
 		SmartDashboard.putData("SetLights", new SetLightsSDB());
-		
-//		recordData = new RecordData();
+		SmartDashboard.putNumber("ArmMultiplier", 0.0);
 	}
 
 	/**
@@ -93,8 +89,8 @@ public class Robot extends TimedRobot {
 		driveBase.setAllNeutralMode(NeutralMode.Coast);
 		arduino.setLights(LEDCodes.m_animation, 0, LEDCodes.a_fade);
 		arduino.setLights(LEDCodes.m_colour, 0, LEDCodes.c_yellow);
+		
 		m_autonomousCommand = m_chooser.getSelected();
-
 		/*
 		 * String autoSelected = SmartDashboard.getString("Auto Selector",
 		 * "Default"); switch(autoSelected) { case "My Auto": autonomousCommand
@@ -120,7 +116,7 @@ public class Robot extends TimedRobot {
 	public void teleopInit() {
 		arduino.setLights(LEDCodes.m_animation, 0, LEDCodes.a_carnival);
 		arduino.setLights(LEDCodes.m_colour, 0, LEDCodes.c_green);
-		driveBase.setAllNeutralMode(NeutralMode.Coast);
+		driveBase.setAllNeutralMode(NeutralMode.Brake);
 		// This makes sure that the autonomous stops running when
 		// teleop starts running. If you want the autonomous to
 		// continue until interrupted by another command, remove

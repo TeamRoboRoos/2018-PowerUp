@@ -13,12 +13,11 @@ import edu.wpi.first.wpilibj.command.Command;
  */
 public class DriveArcade extends Command {
 
-	private boolean bLast = false;
-	private boolean MP = false;
+	private boolean bLast = false; //Button held last loop?
+	private boolean MP = false; //Motion Profile execute mode
 	
     public DriveArcade() {
         // Use requires() here to declare subsystem dependencies
-        // eg. requires(chassis);
     	requires(Robot.driveBase);
     }
 
@@ -28,8 +27,8 @@ public class DriveArcade extends Command {
     
     // Called repeatedly when this Command is scheduled to run
     protected void execute() {
-    	double fwd = -Robot.oi.getDriveRawAxis(RobotMap.CONTROL_DRIVE_0_Y) * 0.8;
-    	double rot = -Robot.oi.getDriveRawAxis(RobotMap.CONTROL_DRIVE_0_Z) * 0.8 * 0.8;
+    	double fwd = -Robot.oi.getDriveRawAxis(RobotMap.CONTROL_DRIVE_0_Y) * RobotMap.DRIVE_OPP_LIMIT;
+    	double rot = -Robot.oi.getDriveRawAxis(RobotMap.CONTROL_DRIVE_0_Z) * 0.8 * RobotMap.DRIVE_OPP_LIMIT;
     	
     	
     	if(!MP) {
@@ -39,11 +38,11 @@ public class DriveArcade extends Command {
     		boolean b = Robot.oi.getDriveRawButton(2);
 
     		if(b) {
-//    			Robot.driveBase.profile.reset();
     			SetValueMotionProfile setOutput = Robot.driveBase.profileLeft.getSetValue();
     			System.out.println(setOutput.toString());//XXX
     			Robot.driveBase.leftMaster.set(ControlMode.MotionProfile, setOutput.value);
     			if(b && !bLast) {
+//    				Robot.driveBase.profile.reset();
     				Robot.driveBase.profileLeft.startMotionProfile();
     			}
     		}

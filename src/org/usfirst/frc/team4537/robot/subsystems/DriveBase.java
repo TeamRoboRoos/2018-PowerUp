@@ -2,7 +2,8 @@ package org.usfirst.frc.team4537.robot.subsystems;
 
 import org.usfirst.frc.team4537.robot.Robot;
 import org.usfirst.frc.team4537.robot.RobotMap;
-import org.usfirst.frc.team4537.robot.commands.DriveArcade;
+import org.usfirst.frc.team4537.robot.commands.*;
+import org.usfirst.frc.team4537.robot.utilities.Functions;
 import org.usfirst.frc.team4537.robot.utilities.MotionProfile;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
@@ -10,9 +11,7 @@ import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 
-import edu.wpi.first.wpilibj.Utility;
 import edu.wpi.first.wpilibj.command.Subsystem;
-import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /**
@@ -62,6 +61,7 @@ public class DriveBase extends Subsystem {
 //    	rightSlave2.set(ControlMode.Follower, rightMaster.getDeviceID());
 //    	rightSlave2.setInverted(rightMaster.getInverted());
     	
+    	//Setup velocity control
     	/* Left Side */
     	/* first choose the sensor */
     	leftMaster.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, 0, 10);
@@ -96,15 +96,20 @@ public class DriveBase extends Subsystem {
     	rightMaster.config_kI(0, 0, 10);
     	rightMaster.config_kD(0, 0, 10);
     	
-    	profileLeft = new MotionProfile(leftMaster, org.usfirst.frc.team4537.robot.utilities.Functions.readProfileFile("testprofile2.csv"));
+    	//Setup motion profile
+    	profileLeft = new MotionProfile(leftMaster, Functions.readProfileFile("testprofile2.csv"));
 	}
 	
     public void initDefaultCommand() {
         // Set the default command for a subsystem here.
-        setDefaultCommand(new DriveArcade());
+        setDefaultCommand(new ArmTest());
         SmartDashboard.putNumber("PID_Right", 4);
     }
     
+    /**
+	 * Set neutral mode of all motors
+	 * @param mode
+	 */
     public void setAllNeutralMode(NeutralMode mode) {
     	leftMaster.setNeutralMode(mode);
     	leftSlave1.setNeutralMode(mode);
@@ -115,6 +120,10 @@ public class DriveBase extends Subsystem {
     	neutralMode = mode;
     }
     
+    /**
+     * Get neutral mode of all motors
+     * @return <b>true</b> if coasting, <b>false</b> if breaking
+     */
     public boolean getAllNeutralMode() {
     	return neutralMode == NeutralMode.Coast ? true : false;
     }
@@ -122,41 +131,66 @@ public class DriveBase extends Subsystem {
     /**
      * Sets speed of left motor
      * @param leftValue
+     * @param vel Velocity control?
      */
-    public void setLeftMotor(double leftValue) {
-    	//Convert to %robot velocity
-    	leftValue *= RobotMap.ROBOT_MAX_SPEED;
-		leftMaster.set(ControlMode.Velocity, leftValue);
-//		leftMaster.set(ControlMode.PercentOutput, leftValue);
+    public void setLeftMotor(double leftValue, boolean vel) {
+    	if(vel) {
+    		//Convert to %robot velocity
+    		leftValue *= RobotMap.ROBOT_MAX_SPEED;
+    		leftMaster.set(ControlMode.Velocity, leftValue);
+    	} else {
+    		leftMaster.set(ControlMode.PercentOutput, leftValue);
+    	}
     }
     
     /**
      * Sets speed of right motor
      * @param leftValue
+     * @param vel Velocity control?
      */
-    public void setRightMotor(double rightValue) {
-    	//Convert to %robot velocity
-    	rightValue *= RobotMap.ROBOT_MAX_SPEED;
-		rightMaster.set(ControlMode.Velocity, rightValue);
-//		rightMaster.set(ControlMode.PercentOutput, rightValue);
+    public void setRightMotor(double rightValue, boolean vel) {
+    	if(vel) {
+    		//Convert to %robot velocity
+    		rightValue *= RobotMap.ROBOT_MAX_SPEED;
+    		rightMaster.set(ControlMode.Velocity, rightValue);
+    	} else {
+    		rightMaster.set(ControlMode.PercentOutput, rightValue);
+    	}
     }
     
     /**
      * Sets speed of left and right motors
      * @param leftValue
      * @param rightValue
+     * @param vel Velocity control?
      */
-    public void setLeftRightMotors(double leftValue, double rightValue) {
-		setLeftMotor(leftValue);
-		setRightMotor(rightValue);
+    public void setLeftRightMotors(double leftValue, double rightValue, boolean vel) {
+		setLeftMotor(leftValue, vel);
+		setRightMotor(rightValue, vel);
     }
     
+    /**
+     * Gets left and right quadrature displacements
+     * @return [left,right]
+     */
     public int[] getEncoderDistances() {
     	return new int[] {leftMaster.getSensorCollection().getQuadraturePosition(), rightMaster.getSensorCollection().getQuadraturePosition()};
     }
     
+    /**
+     * Gets left and right quadrature velocities
+     * @return [left,right] (units per 100ms)
+     */
     public int[] getEncoderVelocities() {
     	return new int[] {leftMaster.getSensorCollection().getQuadratureVelocity(), rightMaster.getSensorCollection().getQuadratureVelocity()};
+    }
+    
+    /**
+     * gets left and right motor outputs
+     * @return [left,right] (%Output)
+     */
+    public double[] getMotorOutputs() {
+    	return new double[] {leftMaster.getMotorOutputPercent(), rightMaster.getMotorOutputPercent()};
     }
     
     /**
@@ -168,7 +202,7 @@ public class DriveBase extends Subsystem {
      * @param squaredInputs If set, decreases the sensitivity at low speeds
      */
     public void arcadeDrive(double speed, double turn, boolean squaredInputs){
-		double moveValue = speed;// * direction;
+		double moveValue = speed * direction;
 		double rotateValue = turn;
 		int moveSign = (int)(moveValue/Math.abs(moveValue));
 		int rotateSign = (int)(rotateValue/Math.abs(rotateValue));
@@ -180,17 +214,7 @@ public class DriveBase extends Subsystem {
 //		if (rotateValue < Config.DEADZONE_R && rotateValue > -Config.DEADZONE_R) {
 //			rotateValue = 0;
 //		}
-
-//		moveSign = -1;
-//		if (moveValue < 0) {
-//			moveSign = 1;
-//		}
-//
-//		rotateSign = 1;
-//		if (rotateValue < 0) {
-//			rotateSign = -1;
-//		}
-		
+//		//Halve speed code
 //		if (speedHalved) {
 //			moveValue *= Config.JOYSTICK_HALF_MOVE_MULTIPLIER;
 //			rotateValue *= Config.JOYSTICK_HALF_ROTATE_MULTIPLIER;
@@ -201,19 +225,6 @@ public class DriveBase extends Subsystem {
 			moveValue = Math.pow(moveValue, 2) * moveSign;
 			rotateValue = Math.pow(rotateValue, 2) * rotateSign;
 		}
-
-//		//Check acceleraton limitation
-//		moveValue = Math.abs(moveValue) * moveSign;
-//		rotateValue = Math.abs(rotateValue) * rotateSign;
-
-//		//Use a PID for acceleration control
-//		movePID.setTarget(moveValue);
-//		moveValue = movePID.calculate(previousMV);
-//		previousMV = moveValue;
-//		
-//		turnPID.setTarget(rotateValue);
-//		rotateValue = turnPID.calculate(previousRV);
-//		previousRV = rotateValue;
 
 		//Mathy arcadey stuffy
 		double leftSpeed, rightSpeed;
@@ -249,13 +260,7 @@ public class DriveBase extends Subsystem {
 		rightSpeed = Math.min(rightSpeed, 1);
 		
 		//Output to motors
-		setLeftRightMotors(leftSpeed, rightSpeed);
-
-//		//Calculate robot drive power draw
-//		leftCurrent = pdp.getCurrent(0) + pdp.getCurrent(1) + pdp.getCurrent(2);
-//		rightCurrent = pdp.getCurrent(13) + pdp.getCurrent(14) + pdp.getCurrent(15);
-
-//		Timer.delay(0.005); //wait for a motor update time //Is this even necessary?
+		setLeftRightMotors(leftSpeed, rightSpeed, RobotMap.DRIVE_VEL);
 	}
     
     /**
@@ -268,6 +273,41 @@ public class DriveBase extends Subsystem {
      */
     public void arcadeDrive(double speed, double turn) {
     	arcadeDrive(speed, turn, true);
+    }
+    
+    public void tankDrive(double left, double right) {
+    	tankDrive(left, right, true);
+    }
+    
+    public void tankDrive(double left, double right, boolean squaredInputs) {
+    	double leftSpeed = left;
+		double rightSpeed = right;
+		if(direction == -1) {
+			leftSpeed = -right;
+			rightSpeed = -left;
+		}
+		
+		int leftSign = (int)(leftSpeed/Math.abs(leftSpeed));
+		int rightSign = (int)(rightSpeed/Math.abs(rightSpeed));
+
+		//Apply squared inputs
+		if(squaredInputs) {
+			leftSpeed = Math.pow(leftSpeed, 2) * leftSign;
+			rightSpeed = Math.pow(rightSpeed, 2) * rightSign;
+		}
+
+		//Set Maximum and Minimum
+		leftSpeed = Math.max(leftSpeed, -1);
+		leftSpeed = Math.min(leftSpeed, 1);
+		rightSpeed = Math.max(rightSpeed, -1);
+		rightSpeed = Math.min(rightSpeed, 1);
+		
+		//Output to motors
+		setLeftRightMotors(leftSpeed, rightSpeed, RobotMap.DRIVE_VEL);
+    }
+    
+    public void flipDirection() {
+    	direction *= -1;
     }
 }
 
