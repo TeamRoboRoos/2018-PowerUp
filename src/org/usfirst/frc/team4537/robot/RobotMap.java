@@ -71,6 +71,9 @@ public class RobotMap {
 	//Climb motors
 	public static final int CAN_MOTOR_CLIMB_1 = 8;
 	public static final int CAN_MOTOR_CLIMB_2 = 9;
+	public static final double CLIMB_SPEED = 0.5;
+	public static final boolean CLIMB_UP = true;
+	public static final boolean CLIMB_DOWN = false;
 	//Module IDs
 	public static final int CAN_PDP_0 = 0;
 	public static final int CAN_PCM_0 = 10;
@@ -79,6 +82,9 @@ public class RobotMap {
 	//Grabbers
 	public static final int PWM_MOTOR_GRAB_L = 1;
 	public static final int PWM_MOTOR_GRAB_R = 2;
+	public static final double CHAINSAW_SPEED = 0.4;
+	public static final boolean CHAINSAW_LOAD = true;
+	public static final boolean CHAINSAW_PLACE = false;
 	
 	//PCM Ports
 	public static final int PCM_ARM_BOTTOM = 0;

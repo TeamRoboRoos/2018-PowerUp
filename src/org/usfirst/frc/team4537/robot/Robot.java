@@ -34,6 +34,7 @@ public class Robot extends TimedRobot {
 	public static final DriveBase driveBase = new DriveBase();
 	public static final Arm arm = new Arm();
 	public static final Grabber grabber = new Grabber();
+	public static final Climber climber = new Climber();
 	public static final Telemetry telemetry = new Telemetry();
 	public static final Arduino arduino = new Arduino();
 	public static OI oi;
