@@ -16,6 +16,7 @@ import edu.wpi.first.wpilibj.command.Scheduler;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import org.usfirst.frc.team4537.robot.commands.*;
+import org.usfirst.frc.team4537.robot.enums.ArmPosition;
 import org.usfirst.frc.team4537.robot.enums.LEDCodes;
 import org.usfirst.frc.team4537.robot.subsystems.*;
 
@@ -40,8 +41,6 @@ public class Robot extends TimedRobot {
 	Command m_autonomousCommand;
 	SendableChooser<Command> m_chooser = new SendableChooser<>();
 
-	Command recordData;
-
 	/**
 	 * This function is run when the robot is first started up and should be
 	 * used for any initialization code.
@@ -49,11 +48,19 @@ public class Robot extends TimedRobot {
 	@Override
 	public void robotInit() {
 		oi = new OI();
-		m_chooser.addDefault("Auto Encoder Baseline", new AutoLineEnc());
+		m_chooser.addDefault("Run Motors", new RunMotors());
+		m_chooser.addObject("Auto Encoder Baseline", new AutoLineEnc());
 		SmartDashboard.putData("Auto mode", m_chooser);
 
 		SmartDashboard.putData("SetLights", new SetLightsSDB());
 		SmartDashboard.putNumber("ArmMultiplier", 0.0);
+
+		SmartDashboard.putData("Arm_Load", new SetArm2(ArmPosition.load));
+		SmartDashboard.putData("Arm_Home", new SetArm2(ArmPosition.home));
+		SmartDashboard.putData("Arm_Fence", new SetArm2(ArmPosition.fence));
+		SmartDashboard.putData("Arm_ScaleLM", new SetArm2(ArmPosition.scaleLowMid));
+		SmartDashboard.putData("Arm_ScaleH", new SetArm2(ArmPosition.scaleHigh));
+//		SmartDashboard.putData("Arm_Home", new SetArm2(ArmPosition.climb));
 	}
 
 	/**

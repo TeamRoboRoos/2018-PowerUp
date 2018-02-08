@@ -16,7 +16,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 public class RecordData extends Command {
 
 	private DriverStation ds = DriverStation.getInstance();
-	private int[] valsMax = {0,0,0,0};
 	
     public RecordData() {
     	setRunWhenDisabled(true);
@@ -28,6 +27,8 @@ public class RecordData extends Command {
 
     // Called just before this Command runs the first time
     protected void initialize() {
+    	SmartDashboard.putNumber("Arm_DrivePW", 0.0);
+    	SmartDashboard.putNumber("Drive_PW", 0.0);
     }
 
     // Called repeatedly when this Command is scheduled to run
@@ -36,19 +37,13 @@ public class RecordData extends Command {
     	int[] vel = Robot.driveBase.getEncoderVelocities();
     	int[] vals = {enc[0],enc[1],vel[0],vel[1]};
     	
-    	for(int i=0; i < valsMax.length; i++) {
-    		vals[i] = Math.abs(vals[i]);
-    		if(vals[i] > valsMax[i]) {
-    			valsMax[i] = vals[i];
-    		}
-    	}
-    	
     	if(Robot.telemetry.getUserButton()) {
     		if(!Robot.driveBase.getAllNeutralMode()) {
     			Robot.driveBase.setAllNeutralMode(NeutralMode.Coast);
     		}
     	}
 
+    	//Subsystems
     	SmartDashboard.putData("DriveBase", Robot.driveBase);
 		SmartDashboard.putData("Arm", Robot.arm);
 		SmartDashboard.putData("Grabber", Robot.grabber);
@@ -56,25 +51,47 @@ public class RecordData extends Command {
 		SmartDashboard.putData("Arduino", Robot.arduino);
 		SmartDashboard.putData("Scheduler", Scheduler.getInstance());
 		
+		//Encoders & Velocity
     	SmartDashboard.putNumber("encL", enc[0]);
     	SmartDashboard.putNumber("encR", enc[1]);
     	SmartDashboard.putNumber("velL", vel[0]);
     	SmartDashboard.putNumber("velR", vel[1]);
     	
+    	//Drive stuff
+    	double dpw = SmartDashboard.getNumber("Drive_PW", 0.0);
+    	Robot.driveBase.setRightMotor(dpw, true);
+    	SmartDashboard.putNumber("Drive_SP", dpw*3702);
+    	
+    	//Game data and time
     	SmartDashboard.putNumber("Time Remaining", ds.getMatchTime());
     	SmartDashboard.putString("GameData", ds.getGameSpecificMessage());
-    	double matchTime = DriverStation.getInstance().getMatchTime();
-    	boolean opControl = DriverStation.getInstance().isOperatorControl();
-    	boolean endGame = matchTime <= 30;
-    	boolean teleopStarted = matchTime != -1;
-    	SmartDashboard.putBoolean("EndGame", opControl && endGame && teleopStarted);
-
-    	SmartDashboard.putNumber("EncA", Robot.driveBase.leftMaster.getSensorCollection().getPulseWidthPosition());
     	
+    	//User button
     	SmartDashboard.putBoolean("UserButton", Robot.telemetry.getUserButton());
     	
+    	//Pressure
     	SmartDashboard.putNumber("PressureV", Robot.arm.pressureGet());
+
+    	//Arm stuff
+    	SmartDashboard.putBoolean("CylTop", Robot.arm.getPnuBools()[0]);
+    	SmartDashboard.putBoolean("CylBottom", Robot.arm.getPnuBools()[1]);
+    	SmartDashboard.putNumber("Arm_Quad", Robot.arm.armMotor.getSensorCollection().getQuadraturePosition());
+    	SmartDashboard.putNumber("Arm_Pulse", Robot.arm.armMotor.getSensorCollection().getPulseWidthPosition());
+    	SmartDashboard.putNumber("Arm_SetPT", Robot.arm.armSetPoint);
     	
+//    	Robot.arm.setArmPosition((int)SmartDashboard.getNumber("Arm_DrivePW", 0.0));
+    	
+    	SmartDashboard.putNumber("Arm_Cur", Robot.arm.armPositioner.curPosition.index);
+    	SmartDashboard.putNumber("Arm_Set", Robot.arm.armPositioner.setPosition.index);
+    	SmartDashboard.putNumber("Arm_Mov", Robot.arm.armPositioner.curPosMovingTo);
+    	SmartDashboard.putBoolean("Arm_Done", Robot.arm.armPositioner.done);
+    	SmartDashboard.putNumber("Arm_Step", Robot.arm.armPositioner.step);
+    	SmartDashboard.putNumber("Arm_Loop", Robot.arm.armPositioner.loopCnt);
+    	SmartDashboard.putBoolean("Arm_Comp", Robot.arm.armPositioner.complete);
+    	SmartDashboard.putNumber("Arm_NXT", Robot.arm.armPositioner.nextPosTmp);
+    	SmartDashboard.putBoolean("ARM_DIR", Robot.arm.armPositioner.dirTemp);
+    	
+    	//Logger
     	Robot.telemetry.logger.updateSensor("encL", enc[0]);
     	Robot.telemetry.logger.updateSensor("encR", enc[1]);
     	Robot.telemetry.logger.updateSensor("velL", vel[0]);

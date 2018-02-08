@@ -1,7 +1,9 @@
 package org.usfirst.frc.team4537.robot.subsystems;
 
 import org.usfirst.frc.team4537.robot.RobotMap;
+import org.usfirst.frc.team4537.robot.enums.ArmPosition;
 import org.usfirst.frc.team4537.robot.enums.ArmPositions;
+import org.usfirst.frc.team4537.robot.utilities.ArmPositioner;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
@@ -13,19 +15,22 @@ import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.command.Subsystem;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /**
  *
  */
 public class Arm extends Subsystem {
 
-	private boolean invertArm = false;
+	public ArmPositioner armPositioner;
+	
+	private boolean invertArm = true;
 	private boolean sensorPhase = true;
 	private NeutralMode neutralMode = NeutralMode.Coast;
-	private ArmPositions armSetPoint;
-	private ArmPositions pneuSetPoint;
-	private int encBound = 20;
-	private TalonSRX armMotor;
+	public int armSetPoint;
+	private ArmPositions pneuSetPoint = ArmPositions.p_upright;
+	private int encBound = 100;
+	public TalonSRX armMotor;
 	private Compressor compressor;
 	private AnalogInput pressureSens;
 	private DigitalInput cylTop;
@@ -36,10 +41,12 @@ public class Arm extends Subsystem {
 	private boolean compressorEnabled = true;
 
 	public Arm() {
+		armPositioner = new ArmPositioner();
+		
 		armMotor = new TalonSRX(RobotMap.CAN_MOTOR_ARM);
-		armMotor.set(ControlMode.PercentOutput, 0);
+		armMotor.set(ControlMode.PercentOutput, 0.0);
 //		armMotor.configClosedloopRamp(0.2, 10);
-//		armMotor.setSensorPhase(sensorPhase);
+		armMotor.setSensorPhase(sensorPhase);
 		armMotor.setInverted(invertArm);
 
 		compressor = new Compressor(RobotMap.CAN_PCM_0);
@@ -68,70 +75,112 @@ public class Arm extends Subsystem {
 
 		/* set closed loop gains in slot0 */
 		armMotor.config_kF(0, 0, 10); 
-		armMotor.config_kP(0, 0.1, 10);
-		armMotor.config_kI(0, 0, 10);
+		armMotor.config_kP(0, 0.25, 10);
+		armMotor.config_kI(0, 0.001, 10);
 		armMotor.config_kD(0, 0, 10);
+		armMotor.config_IntegralZone(0, 0, 10);
 
 		/*
 		 * lets grab the 360 degree position of the MagEncoder's absolute
 		 * position, and initially set the relative sensor to match.
 		 */
 		int absolutePosition = armMotor.getSensorCollection().getPulseWidthPosition();
-		/* mask out overflows, keep bottom 12 bits */
-		absolutePosition &= 0xFFF;
+//		/* mask out overflows, keep bottom 12 bits */
+//		absolutePosition &= 0xFFF;
 		if (sensorPhase)
 			absolutePosition *= -1;
 		if (invertArm)
 			absolutePosition *= -1;
 		/* set the quadrature (relative) sensor to match absolute */
 		armMotor.setSelectedSensorPosition(absolutePosition, 0, 10);
+		
+		//Set motor to hold position
+		armMotor.set(ControlMode.Position, absolutePosition);
+		armSetPoint = absolutePosition;
 	}
 
 	public void initDefaultCommand() {
 		// Set the default command for a subsystem here.
 		//setDefaultCommand(new MySpecialCommand());
 	}
+	
+	public void driveArm(double power) {
+		armMotor.set(ControlMode.PercentOutput, power);
+	}
+	
+	public boolean armPositionerCompleted() {
+		return armPositioner.hasCompleted();
+	}
+	
+	public void controlArmPositioner() {
+		armPositioner.control();
+	}
+	
+	public void requestArmPositioner(ArmPosition position) {
+		armPositioner.requestArmPosition(position);
+	}
 
 	/**
 	 * Set position of arm in encoder ticks
 	 * @param setPosition to set
 	 */
-	private void setArmPosition(int pos) {
+	public void setArmPosition(int pos) {
 		armMotor.set(ControlMode.Position, pos);
+		armSetPoint = pos;
 	}
 	
 	/**
 	 * Set position of arm to value in enum
 	 * @param pos
 	 */
-	public void setArmPosition(ArmPositions pos) {
-		setArmPosition(pos.position);
-		armSetPoint = pos;
+	public void setArmPosition(ArmPosition pos) {
+		setArmPosition(pos.arm);
+		SmartDashboard.putString("ArmPosition LastSet", pos.toString());
 	}
 	
-	public ArmPositions getArmPosition() {
+	public int getArmPosition() {
 		return armSetPoint;
 	}
 	
-	public boolean getPneumaticsMoving() {
-		switch(pneuSetPoint) {
-		case p_back:
-			return (true);
-		case p_forward:
-			return (true);
-		case p_upright:
-			return (true);
-		default:
-			return false;
-		}
+	public boolean[] getPnuBools() {
+		return new boolean[] {cylTop.get(), cylBottom.get()};
 	}
 	
-	public boolean getArmMoving() {
-		if(getEncoderPosition() > armSetPoint.position-encBound && getEncoderPosition() < armSetPoint.position+encBound) {
-			return false;
-		} else {
-			return true;
+	/**
+	 * Get if pneumatics have finished moving
+	 * @return <b>true</b> if moving, <b>false</b> if done 
+	 */
+	public boolean getPneumaticsInPos() {
+		boolean inPosition;
+		System.out.println(pneuSetPoint);
+		System.out.println(cylTop.get()+" ::: "+cylBottom.get());
+		switch(pneuSetPoint) {
+		case p_back:
+			inPosition = cylTop.get() && cylBottom.get(); break;
+		case p_upright:
+			inPosition = !cylTop.get() && cylBottom.get(); break;
+		case p_forward:
+			inPosition = !cylTop.get() && !cylBottom.get(); break;
+		default:
+			inPosition = false; break;
 		}
+		SmartDashboard.putBoolean("Moving_P", inPosition);
+		return inPosition;
+	}
+	
+	/**
+	 * Get if arm has finished moving (within bounds)
+	 * @return <b>true</b> if moving, <b>false</b> if done 
+	 */
+	public boolean getArmInPos() {
+		boolean inPosition;
+		if(getEncoderPosition() > armSetPoint-encBound && getEncoderPosition() < armSetPoint+encBound) {
+			inPosition = true;
+		} else {
+			inPosition = false;
+		}
+		SmartDashboard.putBoolean("Moving_A", inPosition);
+		return inPosition;
 	}
 	
 	/**
@@ -139,20 +188,39 @@ public class Arm extends Subsystem {
 	 * @param pos
 	 */
 	public void setPneumaticPosition(ArmPositions pos) {
+		/*
+		 * solTop: true = extend, false = retract
+		 * solBottom: true = retract, false = extend
+		 */
 		switch(pos) {
 		case p_back:
-			solBottom.set(true);
-			solTop.set(true);
+			solTop.set(true); //Extend
+			solBottom.set(false); //Extend
 			break;
 		case p_upright:
-			solBottom.set(true);
-			solTop.set(false);
+			solTop.set(false); //Retract
+			solBottom.set(false); //Extend
 			break;
 		case p_forward:
-			solBottom.set(false);
-			solTop.set(false);
+			solTop.set(false); //Retract
+			solBottom.set(true); //Retract
 			break;
 		default:
+			break;
+		}
+		pneuSetPoint = pos;
+	}
+	
+	public void setPneumaticPosition(int pos) {
+		switch(pos) {
+		case 0:
+			setPneumaticPosition(ArmPositions.p_forward);
+			break;
+		case 1:
+			setPneumaticPosition(ArmPositions.p_upright);
+			break;
+		case 2:
+			setPneumaticPosition(ArmPositions.p_back);
 			break;
 		}
 	}

@@ -76,7 +76,8 @@ public class DriveBase extends Subsystem {
     	/* set closed loop gains in slot0 */
     	leftMaster.config_kF(0, 0.34, 10); 
     	leftMaster.config_kP(0, 0.2, 10);
-    	leftMaster.config_kI(0, 0, 10);
+    	leftMaster.config_kI(0, 0.0005, 10);
+    	leftMaster.config_IntegralZone(0, 100, 10);
     	leftMaster.config_kD(0, 0, 10);
 
     	/* Right Side */
@@ -93,7 +94,8 @@ public class DriveBase extends Subsystem {
     	/* set closed loop gains in slot0 */
     	rightMaster.config_kF(0, 0.34, 10); 
     	rightMaster.config_kP(0, 0.2, 10);
-    	rightMaster.config_kI(0, 0, 10);
+    	rightMaster.config_kI(0, 0.0005, 10);
+    	rightMaster.config_IntegralZone(0, 100, 10);
     	rightMaster.config_kD(0, 0, 10);
     	
     	//Setup motion profile
@@ -102,8 +104,7 @@ public class DriveBase extends Subsystem {
 	
     public void initDefaultCommand() {
         // Set the default command for a subsystem here.
-        setDefaultCommand(new ArmTest());
-        SmartDashboard.putNumber("PID_Right", 4);
+//        setDefaultCommand(new ArmTest());
     }
     
     /**

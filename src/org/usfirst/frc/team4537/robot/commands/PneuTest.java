@@ -1,19 +1,21 @@
 package org.usfirst.frc.team4537.robot.commands;
 
 import org.usfirst.frc.team4537.robot.Robot;
-import org.usfirst.frc.team4537.robot.RobotMap;
+import org.usfirst.frc.team4537.robot.enums.ArmPositions;
 
 import edu.wpi.first.wpilibj.command.Command;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /**
  *
  */
-public class ArmTest extends Command {
+public class PneuTest extends Command {
 
-    public ArmTest() {
+	ArmPositions pos;
+	
+    public PneuTest(ArmPositions pos) {
         // Use requires() here to declare subsystem dependencies
-    	requires(Robot.driveBase);
+        // eg. requires(chassis);
+		this.pos = pos;
     }
 
     // Called just before this Command runs the first time
@@ -22,16 +24,12 @@ public class ArmTest extends Command {
 
     // Called repeatedly when this Command is scheduled to run
     protected void execute() {
-    	double power = Robot.oi.getDriveRawAxis(RobotMap.CONTROL_DRIVE_0_Y);
-    	power *= SmartDashboard.getNumber("ArmMultiplier", 0.0);
-    	Robot.driveBase.setLeftMotor(power, false);
-    	
-    	SmartDashboard.putNumber("ArmPowerOut", ((int)(Robot.driveBase.getMotorOutputs()[0]*1000))/1000.0);
+//    	Robot.arm.setPneumaticPosition(pos);//FIXME
     }
 
     // Make this return true when this Command no longer needs to run execute()
     protected boolean isFinished() {
-        return false;
+        return true;
     }
 
     // Called once after isFinished returns true
