@@ -1,38 +1,39 @@
 package org.usfirst.frc.team4537.robot.subsystems;
 
 import org.usfirst.frc.team4537.robot.RobotMap;
+import org.usfirst.frc.team4537.robot.commands.*;
 
 import edu.wpi.first.wpilibj.Spark;
 import edu.wpi.first.wpilibj.command.Subsystem;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /**
  *
  */
 public class Grabber extends Subsystem {
-	private Spark leftGrab;
-	private Spark rightGrab; //both from the robot's perspective
-
-    // Put methods for controlling this subsystem
-    // here. Call these from Commands.
 	
-	public Grabber() {
-	leftGrab = new Spark(RobotMap.PWM_MOTOR_GRAB_L);
-	rightGrab = new Spark(RobotMap.PWM_MOTOR_GRAB_R);
-}
-    public void initDefaultCommand() {
-        // Set the default command for a subsystem here.
-        //setDefaultCommand(new MySpecialCommand());
-    }
-    public void driveGrabber (boolean direction) {
-    	if (direction == true) {
-        	leftGrab.set(RobotMap.CHAINSAW_SPEED);
-        	rightGrab.set(RobotMap.CHAINSAW_SPEED);
-    	}
-    	else if (direction == false) {
-    		leftGrab.set(-RobotMap.CHAINSAW_SPEED);
-        	rightGrab.set(-RobotMap.CHAINSAW_SPEED);
-    	}
+	private Spark grabLeft;
+	private Spark grabRight; //both from the robot's perspective
 
-    }
+	public Grabber() {
+		grabLeft = new Spark(RobotMap.PWM_MOTOR_GRAB_L);
+		grabRight = new Spark(RobotMap.PWM_MOTOR_GRAB_R);
+		
+		SmartDashboard.putNumber("GrabberTestRun", 0.0);
+	}
+	
+	public void initDefaultCommand() {
+		// Set the default command for a subsystem here.
+//		setDefaultCommand(new GrabTest());
+	}
+	
+	public void driveGrabber (int direction) {
+		driveGrabbersRaw(RobotMap.GRAB_SPEED * direction, -RobotMap.GRAB_SPEED * direction);
+	}
+	
+	public void driveGrabbersRaw(double left, double right) {
+		grabLeft.set(left);
+		grabRight.set(right);
+	}
 }
 

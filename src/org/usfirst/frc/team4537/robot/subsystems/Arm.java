@@ -1,6 +1,7 @@
 package org.usfirst.frc.team4537.robot.subsystems;
 
 import org.usfirst.frc.team4537.robot.RobotMap;
+import org.usfirst.frc.team4537.robot.commands.*;
 import org.usfirst.frc.team4537.robot.enums.ArmPosition;
 import org.usfirst.frc.team4537.robot.enums.ArmPositions;
 import org.usfirst.frc.team4537.robot.utilities.ArmPositioner;
@@ -45,7 +46,7 @@ public class Arm extends Subsystem {
 		
 		armMotor = new TalonSRX(RobotMap.CAN_MOTOR_ARM);
 		armMotor.set(ControlMode.PercentOutput, 0.0);
-//		armMotor.configClosedloopRamp(0.2, 10);
+		armMotor.configClosedloopRamp(0.2, 10);
 		armMotor.setSensorPhase(sensorPhase);
 		armMotor.setInverted(invertArm);
 
@@ -101,7 +102,7 @@ public class Arm extends Subsystem {
 
 	public void initDefaultCommand() {
 		// Set the default command for a subsystem here.
-		//setDefaultCommand(new MySpecialCommand());
+		setDefaultCommand(new PnuTest());
 	}
 	
 	public void driveArm(double power) {
@@ -209,6 +210,7 @@ public class Arm extends Subsystem {
 			break;
 		}
 		pneuSetPoint = pos;
+		System.out.println(pos);
 	}
 	
 	public void setPneumaticPosition(int pos) {
@@ -223,6 +225,10 @@ public class Arm extends Subsystem {
 			setPneumaticPosition(ArmPositions.p_back);
 			break;
 		}
+	}
+	
+	public boolean[] getSolenoidsEnabled() {
+		return new boolean[] {solBottom.get(), solTop.get()};
 	}
 
 	/**

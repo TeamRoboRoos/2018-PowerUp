@@ -9,12 +9,10 @@ package org.usfirst.frc.team4537.robot;
 
 import org.usfirst.frc.team4537.robot.commands.*;
 import org.usfirst.frc.team4537.robot.enums.ArmPosition;
-import org.usfirst.frc.team4537.robot.enums.ArmPositions;
 import org.usfirst.frc.team4537.robot.enums.LEDCodes;
 import org.usfirst.frc.team4537.robot.triggers.*;
 
 import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.buttons.Button;
 import edu.wpi.first.wpilibj.buttons.JoystickButton;
 
 /**
@@ -50,52 +48,59 @@ public class OI {
 	// until it is finished as determined by it's isFinished method.
 	// button.whenReleased(new ExampleCommand());
 	
-	private Joystick controlDrive;
+	private Joystick controlDrive; //14 13
 	private Joystick controlOperate;
 	private EndGame endGame;
-	
-	private JoystickButton armFwd, armMid, armBak;
+//	private ControlPOV0 controlPOV0;
+//	private ControlPOV90 controlPOV90;
+//	private ControlPOV180 controlPOV180;
+//	private ControlPOV270 controlPOV270;
 	
 	//PS4 buttons
-	private JoystickButton load, home, loadSwitch, loadScaleLow, loadScaleNeutral, loadScaleHigh, climb;
+	private JoystickButton loadPos, home, fence, scaleLow, scaleNeutral, scaleHigh, climbPos;
 	private JoystickButton loadCube, placeCube;
 	private JoystickButton climbUp, climbDown;
+	
 	public OI() {
 		controlDrive = new Joystick(RobotMap.CONTROL_DRIVE_0);
 		controlOperate = new Joystick(RobotMap.CONTROL_OPERATE_0);
 		endGame = new EndGame();
 		endGame.whenActive(new SetLights(new int[]{0,1,2,3}, LEDCodes.a_blink, LEDCodes.c_orange));
-
-		armFwd = new JoystickButton(controlDrive, 7);
-		armFwd.whenPressed(new PneuTest(ArmPositions.p_forward));
-		armMid = new JoystickButton(controlDrive, 6);
-		armMid.whenPressed(new PneuTest(ArmPositions.p_upright));
-		armBak = new JoystickButton(controlDrive, 5);
-		armBak.whenPressed(new PneuTest(ArmPositions.p_back));
 		
 		//Buttons for the ps4 controller
-		load = new JoystickButton(controlOperate, 1);
-		load.whenPressed(new SetArm2(ArmPosition.load));
-		home = new JoystickButton(controlOperate, 2);
+		loadPos = new JoystickButton(controlOperate, RobotMap.CONTROL_BUTTON_LOAD_POS);
+		loadPos.whenPressed(new SetArm2(ArmPosition.load));
+		home = new JoystickButton(controlOperate, RobotMap.CONTROL_BUTTON_HOME);
 		home.whenPressed(new SetArm2(ArmPosition.home));
-		loadSwitch = new JoystickButton(controlOperate, 3);
-		loadSwitch.whenPressed(new SetArm2(ArmPosition.fence));
-		loadScaleLow = new JoystickButton(controlOperate, 4);
-		loadScaleLow.whenPressed(new SetArm2(ArmPosition.scaleLowMid));
-		loadScaleNeutral = new JoystickButton(controlOperate, 5);
-//		loadScaleNeutral.whenPressed(new SetArm2(ArmPosition.scaleMid)); not done in armposition?
-		loadScaleHigh = new JoystickButton(controlOperate, 6);
-		loadScaleHigh.whenPressed(new SetArm2(ArmPosition.scaleHigh));
-		climb = new JoystickButton(controlOperate, 7);
-//		climb.whenPressed(new SetArm2(ArmPosition.climb)); not done in armposition?
-		loadCube = new JoystickButton(controlOperate, 8);
-		loadCube.whileHeld(new RunGrabber(RobotMap.CHAINSAW_LOAD));
-		placeCube = new JoystickButton(controlOperate, 9);
-		placeCube.whileHeld(new RunGrabber(RobotMap.CHAINSAW_PLACE));
-		climbUp = new JoystickButton(controlOperate, 10);
-		climbUp.whileHeld(new Climb(RobotMap.CLIMB_UP));
-		climbDown = new JoystickButton(controlOperate, 11);
-		climbDown.whileHeld(new Climb(RobotMap.CLIMB_DOWN));
+		fence = new JoystickButton(controlOperate, RobotMap.CONTROL_BUTTON_FENCE);
+		fence.whenPressed(new SetArm2(ArmPosition.fence));
+		scaleLow = new JoystickButton(controlOperate, RobotMap.CONTROL_BUTTON_SCALE_LOW);
+		scaleLow.whenPressed(new SetArm2(ArmPosition.scaleLowMid));
+		scaleNeutral = new JoystickButton(controlOperate, RobotMap.CONTROL_BUTTON_SCALE_NEUTRAL);
+//		scaleNeutral.whenPressed(new SetArm2(ArmPosition.scaleMid)); not done in armposition?
+		scaleHigh = new JoystickButton(controlOperate, RobotMap.CONTROL_BUTTON_SCALE_HIGH);
+		scaleHigh.whenPressed(new SetArm2(ArmPosition.scaleHigh));
+		climbPos = new JoystickButton(controlOperate, RobotMap.CONTROL_BUTTON_CLIMB_POS);
+//		climbPos.whenPressed(new SetArm2(ArmPosition.climb)); not done in armposition?
+
+		
+//		loadCube = new JoystickButton(controlOperate, RobotMap.CONTROL_BUTTON_GRAB_IN);
+//		loadCube.whileHeld(new RunGrabber(1)); //In
+//		controlPOV90 = new ControlPOV90();
+//		controlPOV90.whileActive(new RunGrabber(1));
+//		placeCube = new JoystickButton(controlOperate, RobotMap.CONTROL_BUTTON_GRAB_OUT);
+//		placeCube.whileHeld(new RunGrabber(-1)); //Out
+//		controlPOV270 = new ControlPOV270();
+//		controlPOV270.whileActive(new RunGrabber(-1));
+		
+//		climbUp = new JoystickButton(controlOperate, RobotMap.CONTROL_BUTTON_CLIMB_UP);
+//		climbUp.whileHeld(new Climb(1)); //Climb up
+//		controlPOV0 = new ControlPOV0();
+//		controlPOV0.whileActive(new Climb(1));
+//		climbDown = new JoystickButton(controlOperate, RobotMap.CONTROL_BUTTON_CLIMB_DOWN);
+//		climbDown.whileHeld(new Climb(-1)); //Climb down
+//		controlPOV180 = new ControlPOV180();
+//		controlPOV180.whileActive(new Climb(-1));
 	}
 	
 	public double getDriveRawAxis(int axis) {
@@ -104,5 +109,8 @@ public class OI {
 	
 	public boolean getDriveRawButton(int button) {
 		return controlDrive.getRawButton(button);
+	}
+	public Joystick getControlOperate() {
+		return controlOperate;
 	}
 }

@@ -7,9 +7,6 @@
 
 package org.usfirst.frc.team4537.robot;
 
-import com.ctre.phoenix.motorcontrol.ControlMode;
-
-import edu.wpi.first.wpilibj.I2C;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.SerialPort;
 
@@ -48,10 +45,24 @@ public class RobotMap {
 	//Controller button mappings
 	//Drive controller
 	//Operator controller
+	//Positions
+	public static final int CONTROL_BUTTON_LOAD_POS = 5;
+	public static final int CONTROL_BUTTON_HOME = 6;
+	public static final int CONTROL_BUTTON_FENCE = 2;
+	public static final int CONTROL_BUTTON_SCALE_LOW = 3;
+	public static final int CONTROL_BUTTON_SCALE_NEUTRAL = 1;
+	public static final int CONTROL_BUTTON_SCALE_HIGH = 4;
+	public static final int CONTROL_BUTTON_CLIMB_POS = 9;
+	//Grabbers
+	public static final int CONTROL_BUTTON_CLIMB_UP = 1;
+	public static final int CONTROL_BUTTON_CLIMB_DOWN = 1;
+	//Climber
+	public static final int CONTROL_BUTTON_GRAB_IN = 1;
+	public static final int CONTROL_BUTTON_GRAB_OUT = 1;
 	
 	//Camera server variables
 	public static final String[] CAM_NAMES = {};//{"Front"};//, "Gear"};
-	public static final String[] CAM_PATHS = {"/dev/video0"};//, "/dev/video1"};
+	public static final String[] CAM_PATHS = {"/dev/video0", "/dev/video1"};
 	public static final int[] CAM_RESOLUTION = {160, 120};  //{Width, Height}
 	public static final int CAM_FPS = 30;
 	public static final int CAM_EX = 50;
@@ -71,20 +82,14 @@ public class RobotMap {
 	//Climb motors
 	public static final int CAN_MOTOR_CLIMB_1 = 8;
 	public static final int CAN_MOTOR_CLIMB_2 = 9;
-	public static final double CLIMB_SPEED = 0.5;
-	public static final boolean CLIMB_UP = true;
-	public static final boolean CLIMB_DOWN = false;
 	//Module IDs
 	public static final int CAN_PDP_0 = 0;
-	public static final int CAN_PCM_0 = 10;
+	public static final int CAN_PCM_0 = 11;
 	
 	//PWM IDs
 	//Grabbers
 	public static final int PWM_MOTOR_GRAB_L = 1;
 	public static final int PWM_MOTOR_GRAB_R = 2;
-	public static final double CHAINSAW_SPEED = 0.4;
-	public static final boolean CHAINSAW_LOAD = true;
-	public static final boolean CHAINSAW_PLACE = false;
 	
 	//PCM Ports
 	public static final int PCM_ARM_BOTTOM = 0;
@@ -93,9 +98,13 @@ public class RobotMap {
 	//Pressure Voltage at 0psi 
 	public static final double PRES_V = 0.490722606;
 	
+	//Setups
 	//Arm setup
-	//Arm gear ratio
-	public static final double ARM_GEAR_RATIO = 42/15;
+//	Code?
+	//Grabber setup
+	public static final double GRAB_SPEED = 0.4;
+	//Climber setup
+	public static final double CLIMB_SPEED = 0.5;
 	
 	//Robot Maximum Speed
 	public static final int ROBOT_MAX_SPEED = 3702; //Revolutions per 100ms

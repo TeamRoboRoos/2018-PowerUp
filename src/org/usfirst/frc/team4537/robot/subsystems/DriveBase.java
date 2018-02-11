@@ -21,10 +21,10 @@ public class DriveBase extends Subsystem {
 	
 	public TalonSRX leftMaster;
 	private TalonSRX leftSlave1;
-//	private TalonSRX leftSlave2;
+	private TalonSRX leftSlave2;
 	private TalonSRX rightMaster;
 	private TalonSRX rightSlave1;
-//	private TalonSRX rightSlave2;
+	private TalonSRX rightSlave2;
 	
 	private int direction = 1;
 	private NeutralMode neutralMode = NeutralMode.Coast; 
@@ -43,9 +43,9 @@ public class DriveBase extends Subsystem {
     	leftSlave1.set(ControlMode.Follower, leftMaster.getDeviceID());
     	leftSlave1.setInverted(leftMaster.getInverted());
     	
-//    	leftSlave2 = new TalonSRX(RobotMap.CAN_MOTOR_DL_3);
-//    	leftSlave2.set(ControlMode.Follower, leftMaster.getDeviceID());
-//    	leftSlave2.setInverted(leftMaster.getInverted());
+    	leftSlave2 = new TalonSRX(RobotMap.CAN_MOTOR_DL_3);
+    	leftSlave2.set(ControlMode.Follower, leftMaster.getDeviceID());
+    	leftSlave2.setInverted(leftMaster.getInverted());
     	
     	rightMaster = new TalonSRX(RobotMap.CAN_MOTOR_DR_4);
     	rightMaster.set(ControlMode.PercentOutput, 0.0);
@@ -57,9 +57,9 @@ public class DriveBase extends Subsystem {
     	rightSlave1.set(ControlMode.Follower, rightMaster.getDeviceID());
     	rightSlave1.setInverted(rightMaster.getInverted());
     	
-//    	rightSlave2 = new TalonSRX(RobotMap.CAN_MOTOR_DR_6);
-//    	rightSlave2.set(ControlMode.Follower, rightMaster.getDeviceID());
-//    	rightSlave2.setInverted(rightMaster.getInverted());
+    	rightSlave2 = new TalonSRX(RobotMap.CAN_MOTOR_DR_6);
+    	rightSlave2.set(ControlMode.Follower, rightMaster.getDeviceID());
+    	rightSlave2.setInverted(rightMaster.getInverted());
     	
     	//Setup velocity control
     	/* Left Side */
@@ -104,7 +104,7 @@ public class DriveBase extends Subsystem {
 	
     public void initDefaultCommand() {
         // Set the default command for a subsystem here.
-//        setDefaultCommand(new ArmTest());
+        setDefaultCommand(new GrabTest());
     }
     
     /**
@@ -114,10 +114,10 @@ public class DriveBase extends Subsystem {
     public void setAllNeutralMode(NeutralMode mode) {
     	leftMaster.setNeutralMode(mode);
     	leftSlave1.setNeutralMode(mode);
-//    	leftSlave2.setNeutralMode(mode);
+    	leftSlave2.setNeutralMode(mode);
     	rightMaster.setNeutralMode(mode);
     	rightSlave1.setNeutralMode(mode);
-//    	rightSlave2.setNeutralMode(mode);
+    	rightSlave2.setNeutralMode(mode);
     	neutralMode = mode;
     }
     

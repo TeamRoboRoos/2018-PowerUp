@@ -1,21 +1,19 @@
 package org.usfirst.frc.team4537.robot.commands;
 
 import org.usfirst.frc.team4537.robot.Robot;
-import org.usfirst.frc.team4537.robot.enums.ArmPositions;
+import org.usfirst.frc.team4537.robot.RobotMap;
 
 import edu.wpi.first.wpilibj.command.Command;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /**
  *
  */
-public class PneuTest extends Command {
+public class GrabTest extends Command {
 
-	ArmPositions pos;
-	
-    public PneuTest(ArmPositions pos) {
+    public GrabTest() {
         // Use requires() here to declare subsystem dependencies
-        // eg. requires(chassis);
-		this.pos = pos;
+        requires(Robot.driveBase);
     }
 
     // Called just before this Command runs the first time
@@ -24,12 +22,15 @@ public class PneuTest extends Command {
 
     // Called repeatedly when this Command is scheduled to run
     protected void execute() {
-//    	Robot.arm.setPneumaticPosition(pos);//FIXME
+    	double pow = SmartDashboard.getNumber("GrabberTestRun", 0.0);
+//    	Robot.grabber.driveGrabbersRaw(pow, pow);
+    	Robot.driveBase.setLeftRightMotors(pow, pow, false);
+    	System.out.println(pow);
     }
 
     // Make this return true when this Command no longer needs to run execute()
     protected boolean isFinished() {
-        return true;
+        return false;
     }
 
     // Called once after isFinished returns true

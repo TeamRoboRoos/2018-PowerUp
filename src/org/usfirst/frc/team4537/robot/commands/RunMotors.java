@@ -10,7 +10,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  */
 public class RunMotors extends Command {
 
-	double speedRun = 0.7;
+	double speedRun = 0.3;
 	double speed;
 	int state = 0;
 	double delaySwap = 15000; //15s
@@ -32,7 +32,7 @@ public class RunMotors extends Command {
 
     // Called repeatedly when this Command is scheduled to run
     protected void execute() {
-    	Robot.driveBase.setLeftRightMotors(speed, speed, false);
+    	Robot.driveBase.setLeftRightMotors(speed, -speed, false);
     	
     	if(System.currentTimeMillis()-delay >= lastTime) {
     		switch(state) {

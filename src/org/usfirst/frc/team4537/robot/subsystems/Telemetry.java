@@ -34,7 +34,7 @@ public class Telemetry extends Subsystem {
 	public Telemetry() {
 		pdp = new PowerDistributionPanel();
 		navX = new AHRS(RobotMap.NAVX_PORT);
-//		SmartDashboard.putData("PDP", pdp);
+		SmartDashboard.putData("PDP", pdp);
 //		SmartDashboard.putData("NavX", navX);
 
 		logger = new Logger(sensors, RobotMap.LOGGER_DELAY, RobotMap.LOGGER_ENABLE);

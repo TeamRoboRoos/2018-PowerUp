@@ -20,7 +20,6 @@ public class RecordData extends Command {
     public RecordData() {
     	setRunWhenDisabled(true);
         // Use requires() here to declare subsystem dependencies
-        // eg. requires(chassis);
     	requires(Robot.telemetry);
     }
     
@@ -30,12 +29,11 @@ public class RecordData extends Command {
     	SmartDashboard.putNumber("Arm_DrivePW", 0.0);
     	SmartDashboard.putNumber("Drive_PW", 0.0);
     }
-
+    
     // Called repeatedly when this Command is scheduled to run
     protected void execute() {
     	int[] enc = Robot.driveBase.getEncoderDistances();
     	int[] vel = Robot.driveBase.getEncoderVelocities();
-    	int[] vals = {enc[0],enc[1],vel[0],vel[1]};
     	
     	if(Robot.telemetry.getUserButton()) {
     		if(!Robot.driveBase.getAllNeutralMode()) {
@@ -59,15 +57,16 @@ public class RecordData extends Command {
     	
     	//Drive stuff
     	double dpw = SmartDashboard.getNumber("Drive_PW", 0.0);
-    	Robot.driveBase.setRightMotor(dpw, true);
+//    	Robot.driveBase.set	RightMotor(dpw, true);
     	SmartDashboard.putNumber("Drive_SP", dpw*3702);
     	
     	//Game data and time
     	SmartDashboard.putNumber("Time Remaining", ds.getMatchTime());
     	SmartDashboard.putString("GameData", ds.getGameSpecificMessage());
     	
-    	//User button
+    	//User input
     	SmartDashboard.putBoolean("UserButton", Robot.telemetry.getUserButton());
+    	SmartDashboard.putNumber("JC POV", Robot.oi.getControlOperate().getPOV(0));
     	
     	//Pressure
     	SmartDashboard.putNumber("PressureV", Robot.arm.pressureGet());

@@ -1,8 +1,6 @@
 package org.usfirst.frc.team4537.robot.commands;
 
 import org.usfirst.frc.team4537.robot.Robot;
-import org.usfirst.frc.team4537.robot.RobotMap;
-
 import edu.wpi.first.wpilibj.command.Command;
 
 /**
@@ -10,15 +8,13 @@ import edu.wpi.first.wpilibj.command.Command;
  */
 public class RunGrabber extends Command {
 	
-	boolean direction;
+	int direction;
 
-	public RunGrabber(boolean direction) {
+	public RunGrabber(int direction) {
+        // Use requires() here to declare subsystem dependencies
         requires(Robot.grabber);
         
         this.direction = direction;
-        
-        // Use requires() here to declare subsystem dependencies
-        // eg. requires(chassis);
     }
 
     // Called just before this Command runs the first time
@@ -42,5 +38,6 @@ public class RunGrabber extends Command {
     // Called when another command which requires one or more of the same
     // subsystems is scheduled to run
     protected void interrupted() {
+    	Robot.grabber.driveGrabber(0);
     }
 }
