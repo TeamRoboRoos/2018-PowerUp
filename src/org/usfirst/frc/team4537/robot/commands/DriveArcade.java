@@ -28,11 +28,11 @@ public class DriveArcade extends Command {
     // Called repeatedly when this Command is scheduled to run
     protected void execute() {
     	double fwd = -Robot.oi.getDriveRawAxis(RobotMap.CONTROL_DRIVE_0_Y) * RobotMap.DRIVE_OPP_LIMIT;
-    	double rot = -Robot.oi.getDriveRawAxis(RobotMap.CONTROL_DRIVE_0_Z) * 0.8 * RobotMap.DRIVE_OPP_LIMIT;
+    	double rot = -Robot.oi.getDriveRawAxis(RobotMap.CONTROL_DRIVE_0_Z) * 0.7 * RobotMap.DRIVE_OPP_LIMIT;
     	
     	
 //    	if(!MP) {
-   		Robot.driveBase.arcadeDrive(fwd, rot, false);
+   		Robot.driveBase.arcadeDrive(fwd, rot, true);
 //    	} else {
 //    		Robot.driveBase.profileLeft.control();
 //    		boolean b = Robot.oi.getDriveRawButton(2);

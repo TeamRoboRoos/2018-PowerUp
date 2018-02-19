@@ -1,6 +1,5 @@
 package org.usfirst.frc.team4537.robot.subsystems;
 
-import org.usfirst.frc.team4537.robot.Robot;
 import org.usfirst.frc.team4537.robot.RobotMap;
 import org.usfirst.frc.team4537.robot.commands.*;
 import org.usfirst.frc.team4537.robot.utilities.Functions;
@@ -12,19 +11,18 @@ import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 
 import edu.wpi.first.wpilibj.command.Subsystem;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /**
  *
  */
-public class DriveBase extends Subsystem {
+public class DriveBase extends Subsystem { 
 	
 	public TalonSRX leftMaster;
 	private TalonSRX leftSlave1;
-	private TalonSRX leftSlave2;
+//	private TalonSRX leftSlave2;
 	private TalonSRX rightMaster;
 	private TalonSRX rightSlave1;
-	private TalonSRX rightSlave2;
+//	private TalonSRX rightSlave2;
 	
 	private int direction = 1;
 	private NeutralMode neutralMode = NeutralMode.Coast; 
@@ -33,19 +31,19 @@ public class DriveBase extends Subsystem {
 
 	public DriveBase() {
     	//Initialize Motor Controllers
-		leftMaster = new TalonSRX(RobotMap.CAN_MOTOR_DL_1);
+		leftMaster = new TalonSRX(RobotMap.CAN_MOTOR_DL_3);
     	leftMaster.set(ControlMode.PercentOutput, 0.0);
     	leftMaster.configClosedloopRamp(0.2, 10); 
     	leftMaster.setSensorPhase(true);
     	leftMaster.setInverted(false);
     	
-    	leftSlave1 = new TalonSRX(RobotMap.CAN_MOTOR_DL_2);
+    	leftSlave1 = new TalonSRX(RobotMap.CAN_MOTOR_DL_1);
     	leftSlave1.set(ControlMode.Follower, leftMaster.getDeviceID());
     	leftSlave1.setInverted(leftMaster.getInverted());
     	
-    	leftSlave2 = new TalonSRX(RobotMap.CAN_MOTOR_DL_3);
-    	leftSlave2.set(ControlMode.Follower, leftMaster.getDeviceID());
-    	leftSlave2.setInverted(leftMaster.getInverted());
+//    	leftSlave2 = new TalonSRX(RobotMap.CAN_MOTOR_DL_1);
+//    	leftSlave2.set(ControlMode.Follower, leftMaster.getDeviceID());
+//    	leftSlave2.setInverted(leftMaster.getInverted());
     	
     	rightMaster = new TalonSRX(RobotMap.CAN_MOTOR_DR_4);
     	rightMaster.set(ControlMode.PercentOutput, 0.0);
@@ -53,13 +51,13 @@ public class DriveBase extends Subsystem {
     	rightMaster.setSensorPhase(true);
     	rightMaster.setInverted(true);
     	
-    	rightSlave1 = new TalonSRX(RobotMap.CAN_MOTOR_DR_5);
+    	rightSlave1 = new TalonSRX(RobotMap.CAN_MOTOR_DR_6);
     	rightSlave1.set(ControlMode.Follower, rightMaster.getDeviceID());
     	rightSlave1.setInverted(rightMaster.getInverted());
     	
-    	rightSlave2 = new TalonSRX(RobotMap.CAN_MOTOR_DR_6);
-    	rightSlave2.set(ControlMode.Follower, rightMaster.getDeviceID());
-    	rightSlave2.setInverted(rightMaster.getInverted());
+//    	rightSlave2 = new TalonSRX(RobotMap.CAN_MOTOR_DR_6);
+//    	rightSlave2.set(ControlMode.Follower, rightMaster.getDeviceID());
+//    	rightSlave2.setInverted(rightMaster.getInverted());
     	
     	//Setup velocity control
     	/* Left Side */
@@ -104,7 +102,7 @@ public class DriveBase extends Subsystem {
 	
     public void initDefaultCommand() {
         // Set the default command for a subsystem here.
-        setDefaultCommand(new GrabTest());
+        setDefaultCommand(new DriveArcade());
     }
     
     /**
@@ -114,10 +112,10 @@ public class DriveBase extends Subsystem {
     public void setAllNeutralMode(NeutralMode mode) {
     	leftMaster.setNeutralMode(mode);
     	leftSlave1.setNeutralMode(mode);
-    	leftSlave2.setNeutralMode(mode);
+//    	leftSlave2.setNeutralMode(mode);
     	rightMaster.setNeutralMode(mode);
     	rightSlave1.setNeutralMode(mode);
-    	rightSlave2.setNeutralMode(mode);
+//    	rightSlave2.setNeutralMode(mode);
     	neutralMode = mode;
     }
     

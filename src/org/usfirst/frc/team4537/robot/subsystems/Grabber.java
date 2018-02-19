@@ -27,8 +27,8 @@ public class Grabber extends Subsystem {
 //		setDefaultCommand(new GrabTest());
 	}
 	
-	public void driveGrabber (int direction) {
-		driveGrabbersRaw(RobotMap.GRAB_SPEED * direction, -RobotMap.GRAB_SPEED * direction);
+	public void driveGrabber (double speed) {
+		driveGrabbersRaw(-speed, speed);
 	}
 	
 	public void driveGrabbersRaw(double left, double right) {

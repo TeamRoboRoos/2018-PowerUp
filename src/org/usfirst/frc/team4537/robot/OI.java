@@ -51,15 +51,13 @@ public class OI {
 	private Joystick controlDrive; //14 13
 	private Joystick controlOperate;
 	private EndGame endGame;
-//	private ControlPOV0 controlPOV0;
-//	private ControlPOV90 controlPOV90;
-//	private ControlPOV180 controlPOV180;
-//	private ControlPOV270 controlPOV270;
 	
 	//PS4 buttons
-	private JoystickButton loadPos, home, fence, scaleLow, scaleNeutral, scaleHigh, climbPos;
 	private JoystickButton loadCube, placeCube;
 	private JoystickButton climbUp, climbDown;
+	private JoystickButton pnuFwd, pnuVet, pnuRev;
+	
+	private JoystickButton reverseDirection;
 	
 	public OI() {
 		controlDrive = new Joystick(RobotMap.CONTROL_DRIVE_0);
@@ -67,44 +65,38 @@ public class OI {
 		endGame = new EndGame();
 		endGame.whenActive(new SetLights(new int[]{0,1,2,3}, LEDCodes.a_blink, LEDCodes.c_orange));
 		
-		//Buttons for the ps4 controller
-		loadPos = new JoystickButton(controlOperate, RobotMap.CONTROL_BUTTON_LOAD_POS);
-		loadPos.whenPressed(new SetArm2(ArmPosition.load));
-		home = new JoystickButton(controlOperate, RobotMap.CONTROL_BUTTON_HOME);
-		home.whenPressed(new SetArm2(ArmPosition.home));
-		fence = new JoystickButton(controlOperate, RobotMap.CONTROL_BUTTON_FENCE);
-		fence.whenPressed(new SetArm2(ArmPosition.fence));
-		scaleLow = new JoystickButton(controlOperate, RobotMap.CONTROL_BUTTON_SCALE_LOW);
-		scaleLow.whenPressed(new SetArm2(ArmPosition.scaleLowMid));
-		scaleNeutral = new JoystickButton(controlOperate, RobotMap.CONTROL_BUTTON_SCALE_NEUTRAL);
-//		scaleNeutral.whenPressed(new SetArm2(ArmPosition.scaleMid)); not done in armposition?
-		scaleHigh = new JoystickButton(controlOperate, RobotMap.CONTROL_BUTTON_SCALE_HIGH);
-		scaleHigh.whenPressed(new SetArm2(ArmPosition.scaleHigh));
-		climbPos = new JoystickButton(controlOperate, RobotMap.CONTROL_BUTTON_CLIMB_POS);
-//		climbPos.whenPressed(new SetArm2(ArmPosition.climb)); not done in armposition?
-
+		loadCube = new JoystickButton(controlDrive, 16);
+		loadCube.whileHeld(new RunGrabber(1)); //In
+		placeCube = new JoystickButton(controlDrive, 11);
+		placeCube.whileHeld(new RunGrabber(-1)); //Out
 		
-//		loadCube = new JoystickButton(controlOperate, RobotMap.CONTROL_BUTTON_GRAB_IN);
-//		loadCube.whileHeld(new RunGrabber(1)); //In
-//		controlPOV90 = new ControlPOV90();
-//		controlPOV90.whileActive(new RunGrabber(1));
-//		placeCube = new JoystickButton(controlOperate, RobotMap.CONTROL_BUTTON_GRAB_OUT);
-//		placeCube.whileHeld(new RunGrabber(-1)); //Out
-//		controlPOV270 = new ControlPOV270();
-//		controlPOV270.whileActive(new RunGrabber(-1));
+		climbUp = new JoystickButton(controlOperate, 6);
+		climbUp.whileHeld(new Climb(1));
+		climbDown = new JoystickButton(controlOperate, 4);
+		climbDown.whileHeld(new Climb(-1));
 		
-//		climbUp = new JoystickButton(controlOperate, RobotMap.CONTROL_BUTTON_CLIMB_UP);
-//		climbUp.whileHeld(new Climb(1)); //Climb up
-//		controlPOV0 = new ControlPOV0();
-//		controlPOV0.whileActive(new Climb(1));
-//		climbDown = new JoystickButton(controlOperate, RobotMap.CONTROL_BUTTON_CLIMB_DOWN);
-//		climbDown.whileHeld(new Climb(-1)); //Climb down
-//		controlPOV180 = new ControlPOV180();
-//		controlPOV180.whileActive(new Climb(-1));
+		loadCube = new JoystickButton(controlOperate, 3);
+		loadCube.whileHeld(new RunGrabber(1));
+		placeCube = new JoystickButton(controlOperate, 5);
+		placeCube.whileHeld(new RunGrabber(-1));
+		
+		pnuFwd = new JoystickButton(controlOperate, 7);
+		pnuFwd.whenPressed(new PnuSet(0));
+		pnuVet = new JoystickButton(controlOperate, 9);
+		pnuVet.whenPressed(new PnuSet(1));
+		pnuRev = new JoystickButton(controlOperate, 11);
+		pnuRev.whenPressed(new PnuSet(2));
+		
+		reverseDirection = new JoystickButton(controlDrive, 2);
+		reverseDirection.whenPressed(new ReverseDirection());
 	}
 	
 	public double getDriveRawAxis(int axis) {
 		return controlDrive.getRawAxis(axis);
+	}
+	
+	public double getOperateRawAxis(int axis) {
+		return controlOperate.getRawAxis(axis);
 	}
 	
 	public boolean getDriveRawButton(int button) {
