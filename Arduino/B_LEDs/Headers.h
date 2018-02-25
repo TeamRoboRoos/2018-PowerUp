@@ -16,7 +16,7 @@ class LedStrip { //A class is a group of other data and functions.
     int r = 255, g = 0, b = 0;
     int from, to;
     Adafruit_NeoPixel obj;
-    AnimationType currentAnimation = AnimationType(6);
+    AnimationType currentAnimation = AnimationType(1);
     long lastTime = 0; //Used in animations
   protected: // protected members can only be accessed by this class or other classes that inherit it.
   public:

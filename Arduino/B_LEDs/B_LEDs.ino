@@ -6,9 +6,9 @@ static bool controlCheck = true; //Set to true to check to ignore CL/NL characte
 static bool rioMode = true; //Set to work with rio (bytes instead of chars)
 
 //Physical strips attached to sepperate data pins //NumLEDs, Pin, Code
-static Adafruit_NeoPixel ledObjs[] = {Adafruit_NeoPixel(30, 3, NEO_GRB + NEO_KHZ800)};//, Adafruit_NeoPixel(15, 3, NEO_GRB + NEO_KHZ800)};
+static Adafruit_NeoPixel ledObjs[] = {Adafruit_NeoPixel(120, 2, NEO_GRB + NEO_KHZ800)};//, Adafruit_NeoPixel(15, 3, NEO_GRB + NEO_KHZ800)};
 //Strip segments in software, they are a part of the above strips //StripNum, FromLED, ToLED
-static LedStrip ledStrips[] = {LedStrip(ledObjs[0], 0, 29)};//, LedStrip(ledObjs[0], 15, 18), LedStrip(ledObjs[0], 19, 24), LedStrip(ledObjs[0], 25, 29)};
+static LedStrip ledStrips[] = {LedStrip(ledObjs[0], 0, 59), LedStrip(ledObjs[0], 60, 119)};//, LedStrip(ledObjs[0], 19, 24), LedStrip(ledObjs[0], 25, 29)};
 
 static int numLedObjs = sizeof(ledObjs) / sizeof(ledObjs[0]); //Number of software objects, these are parts of physical strips
 static int numLedStrips = sizeof(ledStrips) / sizeof(ledStrips[0]); //Number of physical strips

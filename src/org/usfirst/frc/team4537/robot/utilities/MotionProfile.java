@@ -326,6 +326,7 @@ public class MotionProfile {
 	 * able to).
 	 */
 	public void startMotionProfile() {
+		System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
 		_bStart = true;
 	}
 

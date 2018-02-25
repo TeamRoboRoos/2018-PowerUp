@@ -7,14 +7,15 @@ import com.ctre.phoenix.motion.SetValueMotionProfile;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 
 import edu.wpi.first.wpilibj.command.Command;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /**
  *
  */
 public class DriveArcade extends Command {
 
-//	private boolean bLast = false; //Button held last loop?
-//	private boolean MP = false; //Motion Profile execute mode
+	private boolean bLast = false; //Button held last loop?
+	private boolean MP = true; //Motion Profile execute mode
 	
     public DriveArcade() {
         // Use requires() here to declare subsystem dependencies
@@ -23,6 +24,7 @@ public class DriveArcade extends Command {
 
     // Called just before this Command runs the first time
     protected void initialize() {
+    	SmartDashboard.putBoolean("ProfileTest", false);
     }
     
     // Called repeatedly when this Command is scheduled to run
@@ -30,25 +32,29 @@ public class DriveArcade extends Command {
     	double fwd = -Robot.oi.getDriveRawAxis(RobotMap.CONTROL_DRIVE_0_Y) * RobotMap.DRIVE_OPP_LIMIT;
     	double rot = -Robot.oi.getDriveRawAxis(RobotMap.CONTROL_DRIVE_0_Z) * 0.8 * RobotMap.DRIVE_OPP_LIMIT;
     	
-    	
-//    	if(!MP) {
+    	    	
+    	if(!MP) {
    		Robot.driveBase.arcadeDrive(fwd, rot, false);
-//    	} else {
-//    		Robot.driveBase.profileLeft.control();
-//    		boolean b = Robot.oi.getDriveRawButton(2);
-//
-//    		if(b) {
-//    			SetValueMotionProfile setOutput = Robot.driveBase.profileLeft.getSetValue();
-//    			System.out.println(setOutput.toString());//XXX
-//    			Robot.driveBase.leftMaster.set(ControlMode.MotionProfile, setOutput.value);
-//    			if(b && !bLast) {
-////    				Robot.driveBase.profile.reset();
-//    				Robot.driveBase.profileLeft.startMotionProfile();
-//    			}
-//    		}
-//
-//    		bLast = b;
-//    	}
+    	} else {
+        	System.out.println("\nBegin********************");
+    		
+        	Robot.driveBase.profileLeft.control();
+    		boolean b = SmartDashboard.getBoolean("ProfileTest", false); //Robot.oi.getDriveRawButton(2);
+    		
+    		if(b) {
+    			SetValueMotionProfile setOutput = Robot.driveBase.profileLeft.getSetValue();
+    			
+    			System.out.println(setOutput.toString());//XXX
+    			Robot.driveBase.leftMaster.set(ControlMode.MotionProfile, setOutput.value);
+    			if(b && !bLast) {
+//    				Robot.driveBase.profile.reset();
+    				Robot.driveBase.profileLeft.startMotionProfile();
+    			}
+    		}
+
+    		bLast = b;
+    		System.out.println("End************\n");
+    	}
     }
 
     // Make this return true when this Command no longer needs to run execute()

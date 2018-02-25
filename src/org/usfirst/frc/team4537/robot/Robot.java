@@ -9,6 +9,7 @@ package org.usfirst.frc.team4537.robot;
 
 import edu.wpi.cscore.UsbCamera;
 import edu.wpi.first.wpilibj.CameraServer;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.PowerDistributionPanel;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.command.Command;
@@ -41,6 +42,9 @@ public class Robot extends TimedRobot {
 
 	Command m_autonomousCommand;
 	SendableChooser<Command> m_chooser = new SendableChooser<>();
+	
+	public SendableChooser<Integer> stationChooser = new SendableChooser<>();
+	
 
 	/**
 	 * This function is run when the robot is first started up and should be
@@ -51,6 +55,12 @@ public class Robot extends TimedRobot {
 		oi = new OI();
 		m_chooser.addDefault("Run Motors", new RunMotors());
 		m_chooser.addObject("Auto Encoder Baseline", new AutoLineEnc());
+		
+		stationChooser.addDefault("Left", 0);
+		stationChooser.addObject("Center", 1);
+		stationChooser.addObject("Right", 2);
+		SmartDashboard.putData("stationChooser", stationChooser);
+		
 		SmartDashboard.putData("Auto mode", m_chooser);
 
 		SmartDashboard.putData("SetLights", new SetLightsSDB());
@@ -109,6 +119,7 @@ public class Robot extends TimedRobot {
 		// schedule the autonomous command (example)
 		if (m_autonomousCommand != null) {
 			m_autonomousCommand.start();
+			
 		}
 	}
 

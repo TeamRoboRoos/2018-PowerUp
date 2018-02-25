@@ -19,7 +19,7 @@ import edu.wpi.first.wpilibj.SerialPort;
 public class RobotMap {
 	
 	//Logger
-	public static final boolean LOGGER_ENABLE = false;
+	public static final boolean LOGGER_ENABLE = true;
 	public static final int LOGGER_DELAY = 10;
 	
 	//Drive parameters
