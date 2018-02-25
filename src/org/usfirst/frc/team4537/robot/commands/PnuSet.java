@@ -8,27 +8,49 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 /**
  *
  */
-public class PnuTest extends Command {
+public class PnuSet extends Command {
 
-    public PnuTest() {
-        // Use requires() here to declare subsystem dependencies
-//        requires(Robot.arm);
+	int pos;
+	
+    public PnuSet(int pos) {
+        //Use requires() here to declare subsystem dependencies
+        //requires(chassis);
+    	this.pos = pos;
     }
 
     // Called just before this Command runs the first time
     protected void initialize() {
-//    	SmartDashboard.putNumber("PnuTest", 1);
     }
 
     // Called repeatedly when this Command is scheduled to run
     protected void execute() {
-    	Robot.arm.setPneumaticPosition((int)SmartDashboard.getNumber("PnuTest", 0));
-//    	System.out.println(Robot.arm.getSolenoidsEnabled()[0]+" "+Robot.arm.getSolenoidsEnabled()[1]);
+    	int armPos = Robot.arm.curPnuPos;
+    	
+    	boolean move = true;
+    	
+    	if(armPos == 1 && pos == 0) {
+    		move = false;
+    		if(Robot.arm.getEncoderPosition() <= -600) {
+    			move = true;
+    		}
+    	}
+    	if(armPos == 0 && pos == 1) {
+    		move = false;
+    		if(Robot.arm.getEncoderPosition() <= -600) {
+    			move = true;
+    		}
+    	}
+    	
+    	if(move) {
+    		if(!((armPos == 0 && pos == 2) || (armPos == 2 && pos == 0))) {
+    			Robot.arm.setPneumaticPosition(pos);
+    		}
+    	}
     }
 
     // Make this return true when this Command no longer needs to run execute()
     protected boolean isFinished() {
-        return false;
+        return true;
     }
 
     // Called once after isFinished returns true

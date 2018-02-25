@@ -2,9 +2,9 @@ package org.usfirst.frc.team4537.robot.subsystems;
 
 import org.usfirst.frc.team4537.robot.RobotMap;
 import org.usfirst.frc.team4537.robot.commands.*;
-import org.usfirst.frc.team4537.robot.enums.ArmPosition;
-import org.usfirst.frc.team4537.robot.enums.ArmPositions;
-import org.usfirst.frc.team4537.robot.utilities.ArmPositioner;
+//import org.usfirst.frc.team4537.robot.enums.ArmPosition;
+//import org.usfirst.frc.team4537.robot.enums.ArmPositions;
+//import org.usfirst.frc.team4537.robot.utilities.ArmPositioner;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
@@ -23,69 +23,77 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  */
 public class Arm extends Subsystem {
 
-	public ArmPositioner armPositioner;
+//	public ArmPositioner armPositioner;
 	
-	private boolean invertArm = true;
-	private boolean sensorPhase = true;
+	private boolean invertArm = false;
+	private boolean sensorPhase = false;
 	private NeutralMode neutralMode = NeutralMode.Coast;
-	public int armSetPoint;
-	private ArmPositions pneuSetPoint = ArmPositions.p_upright;
-	private int encBound = 100;
-	public TalonSRX armMotor;
+//	private int encBound = 75;
+	public TalonSRX armMaster;
+	private TalonSRX armSlave;
 	private Compressor compressor;
 	private AnalogInput pressureSens;
-	private DigitalInput cylTop;
-	private DigitalInput cylBottom;
+	private DigitalInput cylTopExt;
+	private DigitalInput cylTopRet;
+	private DigitalInput cylBottomExt;
+	private DigitalInput cylBottomRet;
 	private Solenoid solBottom;
 	private Solenoid solTop;
 
 	private boolean compressorEnabled = true;
+	
+	public int curPnuPos = 1;
+	public int armZone = 1;
 
 	public Arm() {
-		armPositioner = new ArmPositioner();
+		armMaster = new TalonSRX(RobotMap.CAN_MOTOR_ARM_2);
+		armMaster.set(ControlMode.PercentOutput, 0.0);
+		armMaster.configClosedloopRamp(0.2, 10);
+		armMaster.setSensorPhase(sensorPhase);
+		armMaster.setInverted(invertArm);
 		
-		armMotor = new TalonSRX(RobotMap.CAN_MOTOR_ARM);
-		armMotor.set(ControlMode.PercentOutput, 0.0);
-		armMotor.configClosedloopRamp(0.2, 10);
-		armMotor.setSensorPhase(sensorPhase);
-		armMotor.setInverted(invertArm);
+		armSlave = new TalonSRX(RobotMap.CAN_MOTOR_ARM_1);
+		armSlave.set(ControlMode.Follower, armMaster.getDeviceID());
+		armSlave.setInverted(!armMaster.getInverted());
 
 		compressor = new Compressor(RobotMap.CAN_PCM_0);
 		pressureSens = new AnalogInput(RobotMap.ANI_PRESSURE);
-		cylTop = new DigitalInput(0);
-		cylBottom = new DigitalInput(1);
+		cylTopExt = new DigitalInput(RobotMap.DGI_CYL_TOP_EXT);
+		cylTopRet = new DigitalInput(RobotMap.DGI_CYL_TOP_RET);
+		cylBottomExt = new DigitalInput(RobotMap.DGI_CYL_BTM_EXT);
+		cylBottomRet = new DigitalInput(RobotMap.DGI_CYL_BTM_RET);
 		solBottom = new Solenoid(RobotMap.CAN_PCM_0, RobotMap.PCM_ARM_BOTTOM);
 		solTop = new Solenoid(RobotMap.CAN_PCM_0, RobotMap.PCM_ARM_TOP);
 
 		//Setup position control
 		/* first choose the sensor */
-		armMotor.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, 0, 10);
+		armMaster.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, 0, 10);
 
 		/* set the peak and nominal outputs, 12V means full */ 
-		armMotor.configNominalOutputForward(0, 10);
-		armMotor.configNominalOutputReverse(0, 10); 
-		armMotor.configPeakOutputForward(1, 10);
-		armMotor.configPeakOutputReverse(-1, 10);
+		armMaster.configNominalOutputForward(0, 10);
+		armMaster.configNominalOutputReverse(0, 10); 
+		armMaster.configPeakOutputForward(1, 10);
+		armMaster.configPeakOutputReverse(-1, 10);
 
 		/*
 		 * set the allowable closed-loop error, Closed-Loop output will be
 		 * neutral within this range. See Table in Section 17.2.1 for native
 		 * units per rotation.
 		 */
-		armMotor.configAllowableClosedloopError(0, 0, 10);
+		armMaster.configAllowableClosedloopError(0, 0, 10);
 
 		/* set closed loop gains in slot0 */
-		armMotor.config_kF(0, 0, 10); 
-		armMotor.config_kP(0, 0.25, 10);
-		armMotor.config_kI(0, 0.001, 10);
-		armMotor.config_kD(0, 0, 10);
-		armMotor.config_IntegralZone(0, 0, 10);
+		armMaster.config_kF(0, 0, 10); 
+		armMaster.config_kP(0, 0.25, 10);
+		armMaster.config_kI(0, 0.001, 10);
+		armMaster.config_kD(0, 0, 10);
+		armMaster.config_IntegralZone(0, 0, 10);
 
 		/*
 		 * lets grab the 360 degree position of the MagEncoder's absolute
 		 * position, and initially set the relative sensor to match.
 		 */
-		int absolutePosition = armMotor.getSensorCollection().getPulseWidthPosition();
+		int absolutePosition = armMaster.getSensorCollection().getPulseWidthPosition();
 //		/* mask out overflows, keep bottom 12 bits */
 //		absolutePosition &= 0xFFF;
 		if (sensorPhase)
@@ -93,136 +101,95 @@ public class Arm extends Subsystem {
 		if (invertArm)
 			absolutePosition *= -1;
 		/* set the quadrature (relative) sensor to match absolute */
-		armMotor.setSelectedSensorPosition(absolutePosition, 0, 10);
+		//only 0 if at home
+		absolutePosition -= RobotMap.ROBOT_HOME_ENC;
+		armMaster.setSelectedSensorPosition(absolutePosition, 0, 10);
 		
 		//Set motor to hold position
-		armMotor.set(ControlMode.Position, absolutePosition);
-		armSetPoint = absolutePosition;
+		armMaster.set(ControlMode.Position, absolutePosition);
+
+		armMaster.enableVoltageCompensation(true);
+		
+		armMaster.configForwardSoftLimitThreshold(0, 10);
+		armMaster.configForwardSoftLimitThreshold(RobotMap.THRESHOLD_FWD_VERTICAL, 10);
+		armMaster.configForwardSoftLimitEnable(true, 10);
+		armMaster.configReverseSoftLimitThreshold(RobotMap.THRESHOLD_REV_VERTICAL, 10);
+		armMaster.configReverseSoftLimitEnable(true, 10);
 	}
 
 	public void initDefaultCommand() {
 		// Set the default command for a subsystem here.
-		setDefaultCommand(new PnuTest());
+		setDefaultCommand(new ArmSet());
 	}
 	
 	public void driveArm(double power) {
-		armMotor.set(ControlMode.PercentOutput, power);
-	}
-	
-	public boolean armPositionerCompleted() {
-		return armPositioner.hasCompleted();
-	}
-	
-	public void controlArmPositioner() {
-		armPositioner.control();
-	}
-	
-	public void requestArmPositioner(ArmPosition position) {
-		armPositioner.requestArmPosition(position);
-	}
-
-	/**
-	 * Set position of arm in encoder ticks
-	 * @param setPosition to set
-	 */
-	public void setArmPosition(int pos) {
-		armMotor.set(ControlMode.Position, pos);
-		armSetPoint = pos;
-	}
-	
-	/**
-	 * Set position of arm to value in enum
-	 * @param pos
-	 */
-	public void setArmPosition(ArmPosition pos) {
-		setArmPosition(pos.arm);
-		SmartDashboard.putString("ArmPosition LastSet", pos.toString());
-	}
-	
-	public int getArmPosition() {
-		return armSetPoint;
+    	System.out.println("POWER" + power);//XXX
+    	boolean rev = false;
+    	if(power > 0) {
+    		rev = true;
+    	}
+    	if(getEncoderPosition() < -3961 && !rev) {
+    		power *= -1;
+    	}
+		armMaster.set(ControlMode.PercentOutput, power);
 	}
 	
 	public boolean[] getPnuBools() {
-		return new boolean[] {cylTop.get(), cylBottom.get()};
+		return new boolean[] {!cylTopExt.get(), !cylTopRet.get(), !cylBottomExt.get(), !cylBottomRet.get()};
 	}
 	
-	/**
-	 * Get if pneumatics have finished moving
-	 * @return <b>true</b> if moving, <b>false</b> if done 
-	 */
-	public boolean getPneumaticsInPos() {
-		boolean inPosition;
-		System.out.println(pneuSetPoint);
-		System.out.println(cylTop.get()+" ::: "+cylBottom.get());
-		switch(pneuSetPoint) {
-		case p_back:
-			inPosition = cylTop.get() && cylBottom.get(); break;
-		case p_upright:
-			inPosition = !cylTop.get() && cylBottom.get(); break;
-		case p_forward:
-			inPosition = !cylTop.get() && !cylBottom.get(); break;
-		default:
-			inPosition = false; break;
-		}
-		SmartDashboard.putBoolean("Moving_P", inPosition);
-		return inPosition;
+	private void setArmLimitReverse(int limit) {
+		armMaster.configReverseSoftLimitThreshold(limit, 10);
 	}
 	
-	/**
-	 * Get if arm has finished moving (within bounds)
-	 * @return <b>true</b> if moving, <b>false</b> if done 
-	 */
-	public boolean getArmInPos() {
-		boolean inPosition;
-		if(getEncoderPosition() > armSetPoint-encBound && getEncoderPosition() < armSetPoint+encBound) {
-			inPosition = true;
-		} else {
-			inPosition = false;
-		}
-		SmartDashboard.putBoolean("Moving_A", inPosition);
-		return inPosition;
+	private void setArmLimitReverse(boolean enable) {
+		armMaster.configReverseSoftLimitEnable(enable, 10);
+	}
+	
+	private void setArmLimitForward(int limit) {
+		armMaster.configForwardSoftLimitThreshold(limit, 10);
+	}
+	
+	private void setArmLimitForward(boolean enable) {
+		armMaster.configForwardSoftLimitEnable(enable, 10);
 	}
 	
 	/**
 	 * Set vertical arm support position
 	 * @param pos
 	 */
-	public void setPneumaticPosition(ArmPositions pos) {
+	public void setPneumaticPosition(int pos) {
 		/*
 		 * solTop: true = extend, false = retract
 		 * solBottom: true = retract, false = extend
 		 */
+		curPnuPos = pos;
 		switch(pos) {
-		case p_back:
+		case 2:
 			solTop.set(true); //Extend
 			solBottom.set(false); //Extend
-			break;
-		case p_upright:
-			solTop.set(false); //Retract
-			solBottom.set(false); //Extend
-			break;
-		case p_forward:
-			solTop.set(false); //Retract
-			solBottom.set(true); //Retract
-			break;
-		default:
-			break;
-		}
-		pneuSetPoint = pos;
-		System.out.println(pos);
-	}
-	
-	public void setPneumaticPosition(int pos) {
-		switch(pos) {
-		case 0:
-			setPneumaticPosition(ArmPositions.p_forward);
+			setArmLimitReverse(false);
+//			setArmLimitReverse(RobotMap.THRESHOLD_REV_BACK);
+			setArmLimitForward(true);
+			setArmLimitForward(RobotMap.THRESHOLD_FWD_BACK);
 			break;
 		case 1:
-			setPneumaticPosition(ArmPositions.p_upright);
+			solTop.set(false); //Retract
+			solBottom.set(false); //Extend
+			setArmLimitReverse(false);
+//			setArmLimitReverse(RobotMap.THRESHOLD_REV_VERTICAL);
+			setArmLimitForward(true);
+			setArmLimitForward(RobotMap.THRESHOLD_FWD_VERTICAL);
 			break;
-		case 2:
-			setPneumaticPosition(ArmPositions.p_back);
+		case 0:
+			solTop.set(false); //Retract
+			solBottom.set(true); //Retract
+			setArmLimitReverse(true);
+			setArmLimitReverse(RobotMap.THRESHOLD_REV_FORWARD);
+			setArmLimitForward(true);
+			setArmLimitForward(RobotMap.THRESHOLD_FWD_FORWARD);
+			break;
+		default:
 			break;
 		}
 	}
@@ -236,7 +203,7 @@ public class Arm extends Subsystem {
 	 * @param mode
 	 */
 	public void setNeutralMode(NeutralMode mode) {
-		armMotor.setNeutralMode(mode);
+		armMaster.setNeutralMode(mode);
 		neutralMode = mode;
 	}
     
@@ -253,7 +220,7 @@ public class Arm extends Subsystem {
      * @return displacement
      */
 	public int getEncoderPosition() {
-		return armMotor.getSensorCollection().getQuadraturePosition();
+		return armMaster.getSensorCollection().getQuadraturePosition();
 	}
 
 	/**
@@ -261,7 +228,7 @@ public class Arm extends Subsystem {
      * @return velocity (units per 100ms)
      */
 	public int getEncoderVelocity() {
-		return armMotor.getSensorCollection().getQuadratureVelocity();
+		return armMaster.getSensorCollection().getQuadratureVelocity();
 	}
 
     /**
@@ -269,7 +236,7 @@ public class Arm extends Subsystem {
      * @return output (%Output)
      */
 	public double getMotorOutput() {
-		return armMotor.getMotorOutputPercent();
+		return armMaster.getMotorOutputPercent();
 	}
 
 	/**

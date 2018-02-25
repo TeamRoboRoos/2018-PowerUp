@@ -18,7 +18,7 @@ public class Climber extends Subsystem {
 	public Climber() {
 		climbMaster = new TalonSRX(RobotMap.CAN_MOTOR_CLIMB_1);
 		climbMaster.set(ControlMode.PercentOutput, 0.0);
-		climbMaster.setInverted(false);
+		climbMaster.setInverted(true);
 		
 		climbSlave = new TalonSRX(RobotMap.CAN_MOTOR_CLIMB_2);
 		climbSlave.set(ControlMode.Follower, climbMaster.getDeviceID());

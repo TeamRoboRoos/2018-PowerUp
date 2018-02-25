@@ -1,6 +1,8 @@
 package org.usfirst.frc.team4537.robot.commands;
 
 import org.usfirst.frc.team4537.robot.Robot;
+import org.usfirst.frc.team4537.robot.RobotMap;
+
 import edu.wpi.first.wpilibj.command.Command;
 
 /**
@@ -23,7 +25,13 @@ public class RunGrabber extends Command {
 
     // Called repeatedly when this Command is scheduled to run
     protected void execute() {
-    	Robot.grabber.driveGrabber(direction);
+    	if(direction == 1) {
+    		Robot.grabber.driveGrabber(RobotMap.GRAB_SPEED);
+    	}
+    	else if(direction == -1) {
+    		Robot.grabber.driveGrabber(RobotMap.GRAB_EJECT);
+    	}
+    	
     }
 
     // Make this return true when this Command no longer needs to run execute()

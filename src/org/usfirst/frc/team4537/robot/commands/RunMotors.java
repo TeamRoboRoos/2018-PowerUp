@@ -10,7 +10,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  */
 public class RunMotors extends Command {
 
-	double speedRun = 0.3;
+	double speedRun = 0.6;
 	double speed;
 	int state = 0;
 	double delaySwap = 15000; //15s

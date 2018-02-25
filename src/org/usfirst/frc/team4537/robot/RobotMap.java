@@ -26,7 +26,7 @@ public class RobotMap {
 	//Arcade drive velocity control? true = %velocity, false = %output
 	public static final boolean DRIVE_VEL = true;
 	//Operator speed limit
-	public static final double DRIVE_OPP_LIMIT = 0.8;
+	public static final double DRIVE_OPP_LIMIT = 1.0;
 	
 	//Controller IDs and axis mappings
 	//Drive controller
@@ -61,8 +61,8 @@ public class RobotMap {
 	public static final int CONTROL_BUTTON_GRAB_OUT = 1;
 	
 	//Camera server variables
-	public static final String[] CAM_NAMES = {};//{"Front"};//, "Gear"};
-	public static final String[] CAM_PATHS = {"/dev/video0", "/dev/video1"};
+	public static final String[] CAM_NAMES = {"Front"};//, "Gear"};
+	public static final String[] CAM_PATHS = {"/dev/video0"};//, "/dev/video1"};
 	public static final int[] CAM_RESOLUTION = {160, 120};  //{Width, Height}
 	public static final int CAM_FPS = 30;
 	public static final int CAM_EX = 50;
@@ -78,38 +78,58 @@ public class RobotMap {
 	public static final int CAN_MOTOR_DR_5 = 5;
 	public static final int CAN_MOTOR_DR_6 = 6;
 	//Arm motors
-	public static final int CAN_MOTOR_ARM = 7;
+	public static final int CAN_MOTOR_ARM_1 = 9;
+	public static final int CAN_MOTOR_ARM_2 = 10;
 	//Climb motors
-	public static final int CAN_MOTOR_CLIMB_1 = 8;
-	public static final int CAN_MOTOR_CLIMB_2 = 9;
+	public static final int CAN_MOTOR_CLIMB_1 = 7;
+	public static final int CAN_MOTOR_CLIMB_2 = 8;
 	//Module IDs
 	public static final int CAN_PDP_0 = 0;
 	public static final int CAN_PCM_0 = 11;
 	
 	//PWM IDs
 	//Grabbers
-	public static final int PWM_MOTOR_GRAB_L = 1;
-	public static final int PWM_MOTOR_GRAB_R = 2;
+	public static final int PWM_MOTOR_GRAB_L = 0;
+	public static final int PWM_MOTOR_GRAB_R = 1;
 	
 	//PCM Ports
 	public static final int PCM_ARM_BOTTOM = 0;
 	public static final int PCM_ARM_TOP = 1;
 	
 	//Pressure Voltage at 0psi 
-	public static final double PRES_V = 0.490722606;
+	public static final double PRES_V = 0.469970655;
 	
 	//Setups
 	//Arm setup
 //	Code?
 	//Grabber setup
-	public static final double GRAB_SPEED = 0.4;
+	public static final double GRAB_SPEED = 0.5;
+	public static final double GRAB_EJECT = -1.0;
 	//Climber setup
-	public static final double CLIMB_SPEED = 0.5;
-	
+	public static final double CLIMB_SPEED = 1.0;
 	//Robot Maximum Speed
-	public static final int ROBOT_MAX_SPEED = 3702; //Revolutions per 100ms
+	public static final int ROBOT_MAX_SPEED = 3573; //Encoder ticks per 100ms
+	//Arm zero Position, AKA home
+	public static final int ROBOT_HOME_ENC = 1788; //Encoder home position
+	
+	//Arm Encoder Limits
+	public static final int THRESHOLD_REV_FORWARD = -554;
+	public static final int THRESHOLD_FWD_FORWARD = -295;
+	public static final int THRESHOLD_REV_VERTICAL = -734;
+	public static final int THRESHOLD_FWD_VERTICAL = 0;
+	public static final int THRESHOLD_REV_VERTICAL2 = -734;
+	public static final int THRESHOLD_FWD_VERTICAL2 = 0;
+	public static final int THRESHOLD_REV_BACK = -3454;
+	public static final int THRESHOLD_FWD_BACK = 0;
+	
 	
 	//Digital and Analog ports
+	//Digital
+	public static final int DGI_CYL_TOP_EXT = 7; //Red
+	public static final int DGI_CYL_TOP_RET = 8; //Yellow
+	public static final int DGI_CYL_BTM_EXT = 6; //Blue
+	public static final int DGI_CYL_BTM_RET = 9; //Black
+	//Analog
 	public static final int ANI_PRESSURE = 0;
 	
 	//Arduino Configuration

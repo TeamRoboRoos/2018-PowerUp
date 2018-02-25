@@ -66,11 +66,11 @@ public class Robot extends TimedRobot {
 		SmartDashboard.putData("SetLights", new SetLightsSDB());
 		SmartDashboard.putNumber("ArmMultiplier", 0.0);
 
-		SmartDashboard.putData("Arm_Load", new SetArm2(ArmPosition.load));
-		SmartDashboard.putData("Arm_Home", new SetArm2(ArmPosition.home));
-		SmartDashboard.putData("Arm_Fence", new SetArm2(ArmPosition.fence));
-		SmartDashboard.putData("Arm_ScaleLM", new SetArm2(ArmPosition.scaleLowMid));
-		SmartDashboard.putData("Arm_ScaleH", new SetArm2(ArmPosition.scaleHigh));
+//		SmartDashboard.putData("Arm_Load", new SetArm2(ArmPosition.load));
+//		SmartDashboard.putData("Arm_Home", new SetArm2(ArmPosition.home));
+//		SmartDashboard.putData("Arm_Fence", new SetArm2(ArmPosition.fence));
+//		SmartDashboard.putData("Arm_ScaleLM", new SetArm2(ArmPosition.scaleLowMid));
+//		SmartDashboard.putData("Arm_ScaleH", new SetArm2(ArmPosition.scaleHigh));
 //		SmartDashboard.putData("Arm_Home", new SetArm2(ArmPosition.climb));
 	}
 

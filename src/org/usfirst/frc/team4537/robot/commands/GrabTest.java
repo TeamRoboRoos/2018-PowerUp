@@ -13,7 +13,7 @@ public class GrabTest extends Command {
 
     public GrabTest() {
         // Use requires() here to declare subsystem dependencies
-        requires(Robot.driveBase);
+//        requires(Robot.driveBase);
     }
 
     // Called just before this Command runs the first time

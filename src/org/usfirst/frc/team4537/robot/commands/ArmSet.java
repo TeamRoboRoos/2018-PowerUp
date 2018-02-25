@@ -1,6 +1,7 @@
 package org.usfirst.frc.team4537.robot.commands;
 
 import org.usfirst.frc.team4537.robot.Robot;
+import org.usfirst.frc.team4537.robot.RobotMap;
 
 import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -8,22 +9,27 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 /**
  *
  */
-public class PnuTest extends Command {
-
-    public PnuTest() {
+public class ArmSet extends Command {
+	
+    public ArmSet() {
         // Use requires() here to declare subsystem dependencies
-//        requires(Robot.arm);
+    	requires(Robot.arm);
     }
 
     // Called just before this Command runs the first time
     protected void initialize() {
-//    	SmartDashboard.putNumber("PnuTest", 1);
+    	Robot.arm.setPneumaticPosition(1);
     }
 
     // Called repeatedly when this Command is scheduled to run
     protected void execute() {
-    	Robot.arm.setPneumaticPosition((int)SmartDashboard.getNumber("PnuTest", 0));
-//    	System.out.println(Robot.arm.getSolenoidsEnabled()[0]+" "+Robot.arm.getSolenoidsEnabled()[1]);
+    	double power = Robot.oi.getOperateRawAxis(RobotMap.CONTROL_DRIVE_0_Y);
+    	power *= 0.8;
+    	
+    	boolean outOfBounds = false;
+//    	if(pnuPos == )
+    	
+    	Robot.arm.driveArm(power);
     }
 
     // Make this return true when this Command no longer needs to run execute()
