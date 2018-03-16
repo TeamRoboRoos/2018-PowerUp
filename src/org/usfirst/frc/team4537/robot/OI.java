@@ -102,6 +102,11 @@ public class OI {
 	public boolean getDriveRawButton(int button) {
 		return controlDrive.getRawButton(button);
 	}
+	
+	public boolean getOperateRawButton(int button) {
+		return controlOperate.getRawButton(button);
+	}
+	
 	public Joystick getControlOperate() {
 		return controlOperate;
 	}
