@@ -1,5 +1,6 @@
 package org.usfirst.frc.team4537.robot.subsystems;
 
+import org.usfirst.frc.team4537.robot.Robot;
 import org.usfirst.frc.team4537.robot.RobotMap;
 import org.usfirst.frc.team4537.robot.commands.*;
 //import org.usfirst.frc.team4537.robot.enums.ArmPosition;
@@ -44,6 +45,8 @@ public class Arm extends Subsystem {
 	
 	public int curPnuPos = 1;
 	public int armZone = 1;
+	
+	public int armHoldPos = 0;
 
 	public Arm() {
 		armMaster = new TalonSRX(RobotMap.CAN_MOTOR_ARM_2);
@@ -123,13 +126,16 @@ public class Arm extends Subsystem {
 	}
 	
 	public void driveArm(double power) {
-    	System.out.println("POWER" + power);//XXX
+//    	System.out.println("POWER" + power);//XXX
     	boolean rev = false;
     	if(power > 0) {
     		rev = true;
     	}
-    	if(getEncoderPosition() < -3961 && !rev) {
-    		power *= -1;
+    	System.out.println(Boolean.toString(!(Robot.oi.getOperateRawAxis(3)<=-0.75)));
+    	if(!(Robot.oi.getOperateRawAxis(3)<=-0.75)) {
+    		if(getEncoderPosition() < -3250 && !rev) {
+    			power *= -1;
+    		}
     	}
 		armMaster.set(ControlMode.PercentOutput, power);
 	}
@@ -176,8 +182,8 @@ public class Arm extends Subsystem {
 		case 1:
 			solTop.set(false); //Retract
 			solBottom.set(false); //Extend
-			setArmLimitReverse(false);
-//			setArmLimitReverse(RobotMap.THRESHOLD_REV_VERTICAL);
+			setArmLimitReverse(true);
+			setArmLimitReverse(RobotMap.THRESHOLD_REV_VERTICAL);
 			setArmLimitForward(true);
 			setArmLimitForward(RobotMap.THRESHOLD_FWD_VERTICAL);
 			break;

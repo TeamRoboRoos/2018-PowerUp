@@ -63,7 +63,7 @@ public class RobotMap {
 	//Camera server variables
 	public static final String[] CAM_NAMES = {"Front"};//, "Gear"};
 	public static final String[] CAM_PATHS = {"/dev/video0"};//, "/dev/video1"};
-	public static final int[] CAM_RESOLUTION = {160, 120};  //{Width, Height}
+	public static final int[] CAM_RESOLUTION = {320, 240};  //{Width, Height}
 	public static final int CAM_FPS = 30;
 	public static final int CAM_EX = 50;
 	public static final int CAM_WB = 50;
@@ -121,6 +121,9 @@ public class RobotMap {
 	public static final int THRESHOLD_FWD_VERTICAL2 = 0;
 	public static final int THRESHOLD_REV_BACK = -3454;
 	public static final int THRESHOLD_FWD_BACK = 0;
+	
+	//Autonomous
+	public static final int AUTO_DRIVE_DST = 23100;//(int)(8114*3.05); //26204 Encoder Ticks
 	
 	
 	//Digital and Analog ports

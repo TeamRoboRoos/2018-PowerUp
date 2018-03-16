@@ -41,6 +41,7 @@ public class Robot extends TimedRobot {
 
 	Command m_autonomousCommand;
 	SendableChooser<Command> m_chooser = new SendableChooser<>();
+	SendableChooser<String> stationChooser = new SendableChooser<>();
 
 	/**
 	 * This function is run when the robot is first started up and should be
@@ -49,7 +50,14 @@ public class Robot extends TimedRobot {
 	@Override
 	public void robotInit() {
 		oi = new OI();
-		m_chooser.addDefault("Run Motors", new RunMotors());
+		
+		stationChooser.addDefault("Left", "L");
+		stationChooser.addObject("Mid", "M");
+		stationChooser.addObject("Right", "R");
+		SmartDashboard.putData("Robot Position", stationChooser);
+		
+		m_chooser.addDefault("Sit Still!", null);
+		m_chooser.addObject("EXPERIMENTAL! CubeFence?", new AutoCubeFence(stationChooser));
 		m_chooser.addObject("Auto Encoder Baseline", new AutoLineEnc());
 		SmartDashboard.putData("Auto mode", m_chooser);
 

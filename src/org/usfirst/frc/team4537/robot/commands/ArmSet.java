@@ -23,11 +23,42 @@ public class ArmSet extends Command {
 
     // Called repeatedly when this Command is scheduled to run
     protected void execute() {
+//    	boolean holdMode = false;
+    	int encPos = Robot.arm.getEncoderPosition();
     	double power = Robot.oi.getOperateRawAxis(RobotMap.CONTROL_DRIVE_0_Y);
-    	power *= 0.8;
+//    	System.out.println("Drive: "+power);//XXX
+//    	if(power <= 0.1 && power >= -0.1) {
+//    		holdMode = true;
+//    	}
+    	power *= 0.9;
     	
-    	boolean outOfBounds = false;
+//    	boolean outOfBounds = false;
 //    	if(pnuPos == )
+    	
+//    	if(holdMode) {
+//    		double error = encPos - Robot.arm.armHoldPos;
+//    		System.out.println("Error: "+error+" / "+error/1000);
+//    		power = -error/1000;
+//    	} else {
+//    		Robot.arm.armHoldPos = encPos;
+//    		
+//    		if(encPos <= 10 && power > 0) {
+//    			power = 0.0;
+//    		}
+//    		if(power > 0) {
+//    			power *= 0.4;
+//    		}
+//    	}
+    	
+    	if(!(Robot.oi.getOperateRawAxis(3)<=-0.75)) {
+    		if(encPos <= -3300) {
+    			int error = encPos+3300;
+    			power = -error/500.0;
+    			System.out.println(error+" / "+power);
+    		}
+    	}
+    	
+//		System.out.println("Hold: "+holdMode+" Power: "+power);//XXX
     	
     	Robot.arm.driveArm(power);
     }

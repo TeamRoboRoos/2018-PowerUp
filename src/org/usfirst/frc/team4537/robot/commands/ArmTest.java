@@ -1,6 +1,7 @@
 package org.usfirst.frc.team4537.robot.commands;
 
 import org.usfirst.frc.team4537.robot.Robot;
+import org.usfirst.frc.team4537.robot.RobotMap;
 
 import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -8,14 +9,11 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 /**
  *
  */
-public class PnuSet extends Command {
+public class ArmTest extends Command {
 
-	int pos;
-	
-    public PnuSet(int pos) {
-        //Use requires() here to declare subsystem dependencies
-        //requires(chassis);
-    	this.pos = pos;
+    public ArmTest() {
+        // Use requires() here to declare subsystem dependencies
+    	requires(Robot.driveBase);
     }
 
     // Called just before this Command runs the first time
@@ -24,33 +22,16 @@ public class PnuSet extends Command {
 
     // Called repeatedly when this Command is scheduled to run
     protected void execute() {
-    	int armPos = Robot.arm.curPnuPos;
+    	double power = Robot.oi.getDriveRawAxis(RobotMap.CONTROL_DRIVE_0_Y);
+    	power *= SmartDashboard.getNumber("ArmMultiplier", 0.0);
+    	Robot.driveBase.setLeftMotor(power, false);
     	
-    	boolean move = true;
-    	System.out.println(pos);
-    	if(armPos == 1 && pos == 0) {
-    		move = false;
-    		if(Robot.arm.getEncoderPosition() <= -600) {
-    			move = true;
-    		}
-    	}
-    	if(armPos == 0 && pos == 1) {
-    		move = false;
-    		if(Robot.arm.getEncoderPosition() <= -500) {
-    			move = true;
-    		}
-    	}
-    	
-    	if(move) {
-    		if(!((armPos == 0 && pos == 2) || (armPos == 2 && pos == 0))) {
-    			Robot.arm.setPneumaticPosition(pos);
-    		}
-    	}
+    	SmartDashboard.putNumber("ArmPowerOut", ((int)(Robot.driveBase.getMotorOutputs()[0]*1000))/1000.0);
     }
 
     // Make this return true when this Command no longer needs to run execute()
     protected boolean isFinished() {
-        return true;
+        return false;
     }
 
     // Called once after isFinished returns true
