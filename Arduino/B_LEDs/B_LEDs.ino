@@ -1,14 +1,14 @@
 #include <Adafruit_NeoPixel.h> //adds the neopixel library to the code. This library handles the data going to the strip.
 #include "Headers.h"
 
-static bool charMode = true; //Set to true to look for chars on serial instead of ints, excludes control character
+static bool charMode = false; //Set to true to look for chars on serial instead of ints, excludes control character
 static bool controlCheck = true; //Set to true to check to ignore CL/NL characters
 static bool rioMode = true; //Set to work with rio (bytes instead of chars)
 
 //Physical strips attached to sepperate data pins //NumLEDs, Pin, Code
-static Adafruit_NeoPixel ledObjs[] = {Adafruit_NeoPixel(120, 2, NEO_GRB + NEO_KHZ800)};//, Adafruit_NeoPixel(15, 3, NEO_GRB + NEO_KHZ800)};
+static Adafruit_NeoPixel ledObjs[] = {Adafruit_NeoPixel(30, 2, NEO_GRB + NEO_KHZ800)};//, Adafruit_NeoPixel(15, 3, NEO_GRB + NEO_KHZ800)};
 //Strip segments in software, they are a part of the above strips //StripNum, FromLED, ToLED
-static LedStrip ledStrips[] = {LedStrip(ledObjs[0], 0, 59), LedStrip(ledObjs[0], 60, 119)};//, LedStrip(ledObjs[0], 19, 24), LedStrip(ledObjs[0], 25, 29)};
+static LedStrip ledStrips[] = {LedStrip(ledObjs[0], 0, 29)};//, LedStrip(ledObjs[0], 60, 119)};//, LedStrip(ledObjs[0], 19, 24), LedStrip(ledObjs[0], 25, 29)};
 
 static int numLedObjs = sizeof(ledObjs) / sizeof(ledObjs[0]); //Number of software objects, these are parts of physical strips
 static int numLedStrips = sizeof(ledStrips) / sizeof(ledStrips[0]); //Number of physical strips

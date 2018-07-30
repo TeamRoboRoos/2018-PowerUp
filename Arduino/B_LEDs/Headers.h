@@ -13,7 +13,7 @@ enum AnimationType {//enums let us give names to different states.
 
 class LedStrip { //A class is a group of other data and functions.
   private:
-    int r = 255, g = 0, b = 0;
+    int r = 0, g = 255, b = 0;
     int from, to;
     Adafruit_NeoPixel obj;
     AnimationType currentAnimation = AnimationType(1);
